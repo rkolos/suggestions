@@ -11,7 +11,7 @@ import { CompanyConfigService } from '../../config/company-config.service';
 
 const SELECT_MENU_CUSTOM_ID = 'suggest_category';
 const CATEGORY_SELECT_MESSAGE =
-  'Выберите категорию предложения — затем откроется форма для заголовка и описания.';
+  'Select a category — then the form for title and description will open. New suggestions are under moderation and will appear in the channel after admin approval.';
 
 type CategoryOption = { id: string; label: string; color: string };
 
@@ -21,7 +21,7 @@ export class SuggestCommand {
 
   @SlashCommand({
     name: 'suggest',
-    description: 'Отправить предложение',
+    description: 'Submit a suggestion',
   })
   public async onSuggest(
     @Context() [interaction]: SlashCommandContext,
@@ -45,7 +45,7 @@ export class SuggestCommand {
 
     const select = new StringSelectMenuBuilder()
       .setCustomId(SELECT_MENU_CUSTOM_ID)
-      .setPlaceholder('Категория')
+      .setPlaceholder('Category')
       .addOptions(options);
 
     const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);

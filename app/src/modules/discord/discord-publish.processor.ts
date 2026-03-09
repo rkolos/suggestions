@@ -23,13 +23,13 @@ const STATUS_COLORS: Record<SuggestionStatus, number> = {
 };
 
 const STATUS_LABELS: Record<SuggestionStatus, string> = {
-  [SuggestionStatus.NEW]: 'На рассмотрении',
-  [SuggestionStatus.OPEN]: 'Открыто для голосования',
-  [SuggestionStatus.IN_PROGRESS]: 'В работе',
-  [SuggestionStatus.COMPLETED]: 'Реализовано',
-  [SuggestionStatus.DUPLICATE]: 'Дубликат',
-  [SuggestionStatus.REJECTED]: 'Отклонено',
-  [SuggestionStatus.PLANNED]: 'Запланировано',
+  [SuggestionStatus.NEW]: 'Under review',
+  [SuggestionStatus.OPEN]: 'Open for voting',
+  [SuggestionStatus.IN_PROGRESS]: 'In progress',
+  [SuggestionStatus.COMPLETED]: 'Completed',
+  [SuggestionStatus.DUPLICATE]: 'Duplicate',
+  [SuggestionStatus.REJECTED]: 'Rejected',
+  [SuggestionStatus.PLANNED]: 'Planned',
 };
 
 const VOTABLE_STATUSES: SuggestionStatus[] = [
@@ -120,7 +120,7 @@ export class DiscordPublishProcessor extends WorkerHost {
           const thread = await message.startThread({
             name: suggestion.title.substring(0, 100),
             autoArchiveDuration: 1440,
-            reason: 'Обсуждение нового предложения',
+            reason: 'Discussion for this suggestion',
           });
           effectiveThreadId = thread.id;
           threadCreated = true;
@@ -147,7 +147,7 @@ export class DiscordPublishProcessor extends WorkerHost {
               SuggestionStatus.DUPLICATE,
             ];
             if (TERMINAL_STATUSES.includes(newStatus)) {
-              await threadChannel.setLocked(true, 'Предложение закрыто/выполнено');
+              await threadChannel.setLocked(true, 'Suggestion closed or completed');
               await threadChannel.setArchived(true);
             } else if (
               newStatus === SuggestionStatus.OPEN ||
@@ -215,8 +215,8 @@ export class DiscordPublishProcessor extends WorkerHost {
 
     if (suggestion.status === SuggestionStatus.DUPLICATE && suggestion.mergedIntoId) {
       embed.addFields({
-        name: 'Оригинал',
-        value: `Объединено с предложением \`${suggestion.mergedIntoId}\``,
+        name: 'Original',
+        value: `Merged into suggestion \`${suggestion.mergedIntoId}\``,
       });
     }
 

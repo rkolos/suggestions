@@ -11,7 +11,7 @@ import type { StringSelectMenuInteraction } from 'discord.js';
 import { CompanyConfigService } from '../../config/company-config.service';
 
 const MODAL_PREFIX = 'suggest_modal';
-const MODAL_TITLE = 'Новое предложение';
+const MODAL_TITLE = 'New suggestion';
 /** Separator for categoryId in modal customId (path-to-regexp style for necord) */
 const MODAL_CUSTOM_ID_SEP = '/';
 
@@ -28,7 +28,7 @@ export class SuggestCategorySelectHandler {
     const companyId = (interaction as { companyId?: string }).companyId;
     if (!companyId) {
       await interaction.reply({
-        content: 'Ошибка: сервер не привязан.',
+        content: 'Error: server is not linked.',
         ephemeral: true,
       });
       return;
@@ -37,7 +37,7 @@ export class SuggestCategorySelectHandler {
     const categoryId = interaction.values[0];
     if (!categoryId) {
       await interaction.reply({
-        content: 'Выберите категорию.',
+        content: 'Please select a category.',
         ephemeral: true,
       });
       return;
@@ -57,20 +57,20 @@ export class SuggestCategorySelectHandler {
         new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
           new TextInputBuilder()
             .setCustomId('suggest_title')
-            .setLabel('Заголовок')
+            .setLabel('Title')
             .setStyle(TextInputStyle.Short)
             .setRequired(true)
             .setMaxLength(100)
-            .setPlaceholder('Краткое название идеи'),
+            .setPlaceholder('Short title for your idea'),
         ),
         new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
           new TextInputBuilder()
             .setCustomId('suggest_description')
-            .setLabel('Описание')
+            .setLabel('Description')
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(true)
             .setMaxLength(2000)
-            .setPlaceholder('Подробно опишите ваше предложение'),
+            .setPlaceholder('Describe your suggestion in detail'),
         ),
       );
 

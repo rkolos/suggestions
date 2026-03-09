@@ -67,7 +67,8 @@ export class SuggestModalHandler {
     appendDiscordBlockSync(discordLog);
 
     return interaction.reply({
-      content: 'Ваше предложение успешно отправлено и находится на рассмотрении!',
+      content:
+        'Your suggestion was submitted successfully. It is under moderation and will appear in the channel after an admin approves it.',
       ephemeral: true,
     });
   }
