@@ -10,6 +10,7 @@ import { SuggestionsModule } from '../suggestions/suggestions.module';
 import { UsersModule } from '../users/users.module';
 import { VotesModule } from '../votes/votes.module';
 import { DiscordCompanyGuard } from './guards/discord-company.guard';
+import { BanCommand } from './commands/ban.command';
 import { SuggestCommand } from './commands/suggest.command';
 import { SuggestCategorySelectHandler } from './commands/suggest-category-select.handler';
 import { SuggestModalHandler } from './commands/suggest-modal.handler';
@@ -49,6 +50,7 @@ const necordModule = NecordModule.forRootAsync({
   exports: [necordModule],
   providers: [
     DiscordCompanyGuard,
+    BanCommand,
     SuggestCommand,
     SuggestCategorySelectHandler,
     SuggestModalHandler,
