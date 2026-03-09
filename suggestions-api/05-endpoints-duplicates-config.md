@@ -132,10 +132,10 @@
 
 **Метод и путь:** `GET /api/v1/suggestions/settings/notifications`  
 **Коды ответов:** 200 OK, 401/403.  
-**Ответ:** объект `NotificationTemplates` (ticket_created, ticket_approved, ticket_rejected). Используется при смене статуса предложения для отправки сообщений пользователю.
+**Ответ:** объект `NotificationTemplates` (ticket_created, ticket_approved, ticket_rejected, ticket_merged). Используется при смене статуса предложения для отправки ЛС автору и сообщения в треде Discord.
 
 **Метод и путь:** `PUT /api/v1/suggestions/settings/notifications`  
-**Body:** `{ "ticket_created": "...", "ticket_approved": "...", "ticket_rejected": "..." }`. Валидация: каждый шаблон ≤ 500 символов.  
+**Body:** `{ "ticket_created": "...", "ticket_approved": "...", "ticket_rejected": "...", "ticket_merged": "..." }`. Валидация: каждый шаблон ≤ 500 символов.  
 **Коды ответов:** 200 OK, 400 Bad Request, 401/403.
 
 Альтернатива: шаблоны входят в общий GET/PUT config (п. 3.13); отдельные эндпоинты — если нужна точечная работа только с уведомлениями.
@@ -158,12 +158,13 @@
   "notifications": {
     "ticket_created": "Привет, {{user}}! Твоя идея №{{id}} принята в работу.",
     "ticket_approved": "Отличные новости! Идея {{title}} одобрена.",
-    "ticket_rejected": "К сожалению, мы не будем это реализовывать."
+    "ticket_rejected": "К сожалению, мы не будем это реализовывать.",
+    "ticket_merged": "Твоя идея объединена с: [{{targetTitle}}]({{targetUrl}}). {{targetDescription}}"
   }
 }
 ```
 
-При необходимости можно добавить `categories` для консистентности.
+Использование шаблонов при смене статуса: ticket_created — OPEN/IN_PROGRESS/PLANNED; ticket_approved — COMPLETED; ticket_rejected — REJECTED; ticket_merged — DUPLICATE (при merge). Плейсхолдеры: {{user}}, {{id}}, {{title}}; для ticket_merged: {{targetTitle}}, {{targetDescription}}, {{targetUrl}} (ссылка на сообщение в Discord). При необходимости можно добавить `categories` для консистентности.
 
 **Назначение:**  
 - Кнопка "Reset to Default" у шаблонов уведомлений в Settings: фронт запрашивает дефолты и подставляет в форму.

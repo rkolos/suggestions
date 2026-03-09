@@ -18,6 +18,7 @@ export class ConfigController {
     categories: unknown[];
     notifications: Record<string, string>;
     suggestionsChannelId: string | null;
+    discordGuildId: string | null;
   }> {
     return this.configService.getConfig(companyId);
   }
@@ -32,6 +33,7 @@ export class ConfigController {
     categories: unknown[];
     notifications: Record<string, string>;
     suggestionsChannelId: string | null;
+    discordGuildId: string | null;
   }> {
     return this.configService.updateConfig(companyId, body);
   }

@@ -35,6 +35,11 @@ export class NotificationTemplatesDto {
   @IsString()
   @MaxLength(500)
   ticket_rejected?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  ticket_merged?: string;
 }
 
 export class UpdateConfigDto {

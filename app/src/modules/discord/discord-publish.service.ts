@@ -26,6 +26,13 @@ export interface DiscordPublishJobPayload {
     mergedIntoId?: string | null;
     author?: { username: string; avatarUrl: string | null };
   };
+  /** Target suggestion data when merging (status DUPLICATE). */
+  mergedInto?: {
+    id: string;
+    title: string;
+    description: string;
+    discordMessageId: string | null;
+  };
 }
 
 @Injectable()
@@ -61,6 +68,7 @@ export class DiscordPublishService {
         mergedIntoId: payload.suggestion.mergedIntoId,
         author: payload.suggestion.author,
       },
+      mergedInto: payload.mergedInto,
     };
 
     this.queue.add('publish', jobPayload).catch((err) => {

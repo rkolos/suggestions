@@ -29,6 +29,7 @@ export class NotificationsController {
     if (body.ticket_created !== undefined) notifications.ticket_created = body.ticket_created;
     if (body.ticket_approved !== undefined) notifications.ticket_approved = body.ticket_approved;
     if (body.ticket_rejected !== undefined) notifications.ticket_rejected = body.ticket_rejected;
+    if (body.ticket_merged !== undefined) notifications.ticket_merged = body.ticket_merged;
     return this.configService.updateNotifications(companyId, notifications);
   }
 }

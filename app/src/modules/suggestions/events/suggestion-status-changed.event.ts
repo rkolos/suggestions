@@ -19,4 +19,11 @@ export interface SuggestionStatusChangedPayload {
     author?: { username: string; avatarUrl: string | null };
     [key: string]: unknown;
   };
+  /** Target suggestion data when merging (status DUPLICATE). */
+  mergedInto?: {
+    id: string;
+    title: string;
+    description: string;
+    discordMessageId: string | null;
+  };
 }

@@ -419,6 +419,12 @@ export class SuggestionsService {
         mergedIntoId: updatedSource.mergedIntoId,
         author: updatedSource.author,
       },
+      mergedInto: {
+        id: target.id,
+        title: target.title,
+        description: target.description,
+        discordMessageId: target.discordMessageId,
+      },
     });
 
     this.eventEmitter.emit('suggestion.merged', {

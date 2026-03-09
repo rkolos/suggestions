@@ -105,6 +105,7 @@ describe('AppController (e2e)', () => {
       .expect((res) => {
         expect(res.body).toHaveProperty('notifications');
         expect(res.body.notifications).toHaveProperty('ticket_created');
+        expect(res.body.notifications).toHaveProperty('ticket_merged');
         expect(res.body).toHaveProperty('categories');
         expect(Array.isArray(res.body.categories)).toBe(true);
         expect(res.body.categories.length).toBe(5);

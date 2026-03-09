@@ -8,6 +8,10 @@ import { CompanyConfigService } from '../config/company-config.service';
 import { SuggestionsService } from '../suggestions/suggestions.service';
 import { VotesService } from '../votes/votes.service';
 import { DISCORD_PUBLISH_QUEUE, DiscordPublishJobPayload } from './discord-publish.service';
+import {
+  getNotificationTemplateKey,
+  renderNotificationTemplate,
+} from './notification-template.util';
 import { buildVoteButtons } from './vote-buttons.util';
 
 const EMBED_DESCRIPTION_MAX_LENGTH = 4000;
@@ -137,6 +141,8 @@ export class DiscordPublishProcessor extends WorkerHost {
       }
 
       const threadId = effectiveThreadId;
+      await this.sendStatusChangeNotifications(companyId, job.data, threadId, config);
+
       if (threadId) {
         try {
           const threadChannel = await this.client.channels.fetch(threadId);
@@ -221,5 +227,68 @@ export class DiscordPublishProcessor extends WorkerHost {
     }
 
     return embed;
+  }
+
+  private async sendStatusChangeNotifications(
+    companyId: string,
+    jobData: DiscordPublishJobPayload,
+    threadId: string | null,
+    config: { discordGuildId: string | null; suggestionsChannelId: string | null },
+  ): Promise<void> {
+    const { suggestion, newStatus, mergedInto } = jobData;
+    const templateKey = getNotificationTemplateKey(newStatus, mergedInto);
+    if (!templateKey) return;
+
+    const templates = await this.companyConfigService.getNotifications(companyId);
+    const template = templates[templateKey]?.trim();
+    if (!template) return;
+
+    const vars: Record<string, string> = {
+      user: suggestion.author?.username ?? '',
+      id: suggestion.id,
+      title: suggestion.title,
+    };
+    if (mergedInto) {
+      vars.targetTitle = mergedInto.title;
+      vars.targetDescription = mergedInto.description;
+      const guildId = config.discordGuildId;
+      const channelId = config.suggestionsChannelId;
+      const messageId = mergedInto.discordMessageId;
+      vars.targetUrl =
+        guildId && channelId && messageId
+          ? `https://discord.com/channels/${guildId}/${channelId}/${messageId}`
+          : '';
+    }
+    const text = renderNotificationTemplate(template, vars);
+    if (!text.trim()) return;
+
+    try {
+      const user = await this.client.users.fetch(suggestion.authorId);
+      await user.send({ content: text });
+    } catch (dmErr) {
+      this.logger.warn(
+        {
+          err: dmErr,
+          companyId,
+          suggestionId: jobData.suggestionId,
+          authorId: suggestion.authorId,
+        },
+        'Failed to send notification DM to author',
+      );
+    }
+
+    if (threadId) {
+      try {
+        const threadChannel = await this.client.channels.fetch(threadId);
+        if (threadChannel?.isThread?.()) {
+          await threadChannel.send({ content: text });
+        }
+      } catch (threadErr) {
+        this.logger.warn(
+          { err: threadErr, companyId, suggestionId: jobData.suggestionId, threadId },
+          'Failed to send notification to Discord thread',
+        );
+      }
+    }
   }
 }

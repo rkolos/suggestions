@@ -3,9 +3,11 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { UpdateConfigDto } from './dto/update-config.dto';
 
 const DEFAULT_NOTIFICATIONS = {
-  ticket_created: 'Привет, {{user}}! Твоя идея №{{id}} принята в работу.',
-  ticket_approved: 'Отличные новости! Идея {{title}} одобрена.',
-  ticket_rejected: 'К сожалению, мы не будем это реализовывать.',
+  ticket_created: 'Hi, {{user}}! Your idea #{{id}} has been accepted for work.',
+  ticket_approved: 'Great news! Idea {{title}} has been approved.',
+  ticket_rejected: 'Unfortunately, we will not be implementing this.',
+  ticket_merged:
+    'Your idea has been merged with: [{{targetTitle}}]({{targetUrl}}). {{targetDescription}}',
 };
 
 const DEFAULT_CATEGORIES: { id: string; label: string; color: string }[] = [
@@ -24,6 +26,7 @@ export class CompanyConfigService {
     categories: unknown[];
     notifications: Record<string, string>;
     suggestionsChannelId: string | null;
+    discordGuildId: string | null;
     version?: string;
   }> {
     const config = await this.prisma.companyConfig.upsert({
@@ -41,6 +44,7 @@ export class CompanyConfigService {
       notifications:
         (config.notificationTemplates as Record<string, string>) ?? DEFAULT_NOTIFICATIONS,
       suggestionsChannelId: config.suggestionsChannelId,
+      discordGuildId: config.discordGuildId,
     };
   }
 
@@ -51,6 +55,7 @@ export class CompanyConfigService {
     categories: unknown[];
     notifications: Record<string, string>;
     suggestionsChannelId: string | null;
+    discordGuildId: string | null;
   }> {
     const updateData: {
       categories?: object;
@@ -84,6 +89,7 @@ export class CompanyConfigService {
       notifications:
         (config.notificationTemplates as Record<string, string>) ?? DEFAULT_NOTIFICATIONS,
       suggestionsChannelId: config.suggestionsChannelId,
+      discordGuildId: config.discordGuildId,
     };
   }
 

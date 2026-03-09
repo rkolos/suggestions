@@ -16,6 +16,7 @@ describe('GlobalExceptionFilter', () => {
     };
     const mockRequest = { url, path: url };
     const host = {
+      getType: (): 'http' => 'http',
       switchToHttp: (): {
         getResponse: () => typeof mockResponse;
         getRequest: () => typeof mockRequest;

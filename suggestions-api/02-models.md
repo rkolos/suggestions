@@ -45,8 +45,8 @@
 | version? | string | Опционально: метка версии для отображения в UI (например "v2.0" в заголовке списка) |
 
 **SuggestionCategory:** `{ id: string, label: string, color: string }` — при необходимости для проверки удаления категории добавлять `suggestionCount?: number` или `canDelete?: boolean` (см. [06-endpoints-team-config.md](06-endpoints-team-config.md)).  
-**NotificationTemplates:** `{ ticket_created: string, ticket_approved: string, ticket_rejected: string }`  
-Шаблоны из config используются бекендом при отправке уведомлений (Discord и т.д.); фронт только загружает и сохраняет их в настройках. Отдельного эндпоинта «получить один шаблон» не требуется.
+**NotificationTemplates:** `{ ticket_created: string, ticket_approved: string, ticket_rejected: string, ticket_merged: string }`  
+Шаблоны из config используются бекендом при отправке уведомлений (Discord: ЛС автору и сообщение в треде); фронт только загружает и сохраняет их в настройках. Отдельного эндпоинта «получить один шаблон» не требуется. Плейсхолдеры: `{{user}}`, `{{id}}`, `{{title}}` — для всех; для ticket_merged дополнительно: `{{targetTitle}}`, `{{targetDescription}}`, `{{targetUrl}}` (ссылка на сообщение в Discord, в которое смержили; заполняется, если у целевого предложения есть discordMessageId и в конфиге компании заданы discordGuildId и suggestionsChannelId).
 
 ## 2.4 BannedUser
 
