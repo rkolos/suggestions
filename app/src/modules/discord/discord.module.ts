@@ -18,6 +18,7 @@ import { DiscordPublishProcessor } from './discord-publish.processor';
 import { DiscordThreadSyncService } from './discord-thread-sync.service';
 import { VoteButtonHandler } from './vote-button.handler';
 import { VoteRateLimitService } from './vote-rate-limit.service';
+import { BanNotificationListener } from './ban-notification.listener';
 import { BansModule } from '../moderation/bans.module';
 
 const necordModule = NecordModule.forRootAsync({
@@ -56,6 +57,7 @@ const necordModule = NecordModule.forRootAsync({
     DiscordThreadSyncService,
     VoteButtonHandler,
     VoteRateLimitService,
+    BanNotificationListener,
     {
       provide: APP_GUARD,
       useClass: DiscordCompanyGuard,

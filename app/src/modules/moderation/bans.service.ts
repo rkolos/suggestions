@@ -1,4 +1,5 @@
 import { Injectable, ConflictException, ForbiddenException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 
@@ -9,13 +10,17 @@ export const USER_BANNED_CODE = 'USER_BANNED';
 
 @Injectable()
 export class BansService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   async banUser(companyId: string, userId: string): Promise<boolean> {
     try {
       await this.prisma.bannedUser.create({
         data: { companyId, userId },
       });
+      this.eventEmitter.emit('user.banned', { companyId, userId });
       return true;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
@@ -29,6 +34,7 @@ export class BansService {
     await this.prisma.bannedUser.deleteMany({
       where: { companyId, userId },
     });
+    this.eventEmitter.emit('user.unbanned', { companyId, userId });
   }
 
   async isBanned(companyId: string, userId: string): Promise<boolean> {
