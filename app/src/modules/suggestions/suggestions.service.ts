@@ -441,7 +441,16 @@ export class SuggestionsService {
   }
 
   async delete(companyId: string, suggestionId: string): Promise<void> {
-    await this.findById(companyId, suggestionId);
+    const suggestion = await this.findById(companyId, suggestionId);
+
+    if (suggestion.discordMessageId ?? suggestion.discordThreadId) {
+      this.eventEmitter.emit('suggestion.deleted', {
+        companyId,
+        suggestionId,
+        discordMessageId: suggestion.discordMessageId ?? null,
+        discordThreadId: suggestion.discordThreadId ?? null,
+      });
+    }
 
     await this.prisma.suggestion.delete({
       where: { id: suggestionId, companyId },
@@ -503,10 +512,21 @@ export class SuggestionsService {
   ): Promise<{ deleted: string[]; failed: { id: string; error: string }[] }> {
     const existing = await this.prisma.suggestion.findMany({
       where: { id: { in: ids }, companyId },
-      select: { id: true },
+      select: { id: true, discordMessageId: true, discordThreadId: true },
     });
     const foundIds = existing.map((s) => s.id);
     const failedIds = ids.filter((id) => !foundIds.includes(id));
+
+    for (const s of existing) {
+      if (s.discordMessageId ?? s.discordThreadId) {
+        this.eventEmitter.emit('suggestion.deleted', {
+          companyId,
+          suggestionId: s.id,
+          discordMessageId: s.discordMessageId ?? null,
+          discordThreadId: s.discordThreadId ?? null,
+        });
+      }
+    }
 
     if (foundIds.length > 0) {
       await this.prisma.suggestion.deleteMany({

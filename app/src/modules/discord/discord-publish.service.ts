@@ -5,8 +5,16 @@ import { Queue } from 'bullmq';
 import { PinoLogger } from 'nestjs-pino';
 import { SuggestionStatus } from '@prisma/client';
 import { SuggestionStatusChangedPayload } from '../suggestions/events/suggestion-status-changed.event';
+import { SuggestionDeletedPayload } from '../suggestions/events/suggestion-deleted.event';
 
 export const DISCORD_PUBLISH_QUEUE = 'discord-publish';
+
+export interface DiscordDeleteJobPayload {
+  companyId: string;
+  suggestionId: string;
+  discordMessageId: string | null;
+  discordThreadId: string | null;
+}
 
 export interface DiscordPublishJobPayload {
   companyId: string;
@@ -81,6 +89,32 @@ export class DiscordPublishService {
       suggestionId: payload.suggestionId,
       oldStatus: payload.oldStatus,
       newStatus: payload.newStatus,
+      result: 'queued',
+      queue: 'discord-publish',
+    });
+  }
+
+  @OnEvent('suggestion.deleted')
+  handleSuggestionDeleted(payload: SuggestionDeletedPayload): void {
+    if (!payload.discordMessageId && !payload.discordThreadId) {
+      return;
+    }
+
+    const jobPayload: DiscordDeleteJobPayload = {
+      companyId: payload.companyId,
+      suggestionId: payload.suggestionId,
+      discordMessageId: payload.discordMessageId ?? null,
+      discordThreadId: payload.discordThreadId ?? null,
+    };
+
+    this.queue.add('delete', jobPayload).catch((err) => {
+      this.logger.error({ err }, 'Failed to add discord delete job to queue');
+    });
+
+    this.logger.info({
+      type: 'discord',
+      event: 'suggestion_deleted',
+      suggestionId: payload.suggestionId,
       result: 'queued',
       queue: 'discord-publish',
     });

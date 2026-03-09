@@ -98,4 +98,37 @@ describe('DiscordPublishService', () => {
 
     expect(queueAdd).not.toHaveBeenCalled();
   });
+
+  describe('handleSuggestionDeleted', () => {
+    it('adds delete job when discordMessageId or discordThreadId present', () => {
+      service.handleSuggestionDeleted({
+        companyId: 'company-1',
+        suggestionId: 'sug_abc',
+        discordMessageId: 'msg-123',
+        discordThreadId: 'thread-456',
+      });
+
+      expect(queueAdd).toHaveBeenCalledTimes(1);
+      expect(queueAdd).toHaveBeenCalledWith(
+        'delete',
+        expect.objectContaining({
+          companyId: 'company-1',
+          suggestionId: 'sug_abc',
+          discordMessageId: 'msg-123',
+          discordThreadId: 'thread-456',
+        }),
+      );
+    });
+
+    it('does not add job when both discord ids are null', () => {
+      service.handleSuggestionDeleted({
+        companyId: 'company-1',
+        suggestionId: 'sug_abc',
+        discordMessageId: null,
+        discordThreadId: null,
+      });
+
+      expect(queueAdd).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -20,6 +20,7 @@ describe('SuggestionsService', () => {
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+      deleteMany: jest.fn(),
     },
   };
 
@@ -174,6 +175,101 @@ describe('SuggestionsService', () => {
       expect(result).toEqual(existing);
       expect(mockPrisma.suggestion.update).not.toHaveBeenCalled();
       expect(eventEmitter.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('delete', () => {
+    it('emits suggestion.deleted and deletes when discord ids present', async () => {
+      const suggestion = {
+        id: 'sug_abc',
+        companyId: 'company-1',
+        discordMessageId: 'msg-123',
+        discordThreadId: 'thread-456',
+        author: {},
+        votes: [],
+      };
+      mockPrisma.suggestion.findFirst.mockResolvedValue(suggestion as never);
+      mockPrisma.suggestion.delete.mockResolvedValue(undefined as never);
+
+      await service.delete('company-1', 'sug_abc');
+
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.deleted', {
+        companyId: 'company-1',
+        suggestionId: 'sug_abc',
+        discordMessageId: 'msg-123',
+        discordThreadId: 'thread-456',
+      });
+      expect(mockPrisma.suggestion.delete).toHaveBeenCalledWith({
+        where: { id: 'sug_abc', companyId: 'company-1' },
+      });
+    });
+
+    it('does not emit suggestion.deleted when no discord ids', async () => {
+      const suggestion = {
+        id: 'sug_abc',
+        companyId: 'company-1',
+        discordMessageId: null,
+        discordThreadId: null,
+        author: {},
+        votes: [],
+      };
+      mockPrisma.suggestion.findFirst.mockResolvedValue(suggestion as never);
+      mockPrisma.suggestion.delete.mockResolvedValue(undefined as never);
+
+      await service.delete('company-1', 'sug_abc');
+
+      expect(eventEmitter.emit).not.toHaveBeenCalled();
+      expect(mockPrisma.suggestion.delete).toHaveBeenCalled();
+    });
+
+    it('throws when suggestion not found', async () => {
+      mockPrisma.suggestion.findFirst.mockResolvedValue(null);
+
+      await expect(service.delete('company-1', 'sug_xxx')).rejects.toThrow(NotFoundException);
+      expect(mockPrisma.suggestion.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('bulkDelete', () => {
+    it('emits suggestion.deleted for each suggestion with discord ids and deletes all', async () => {
+      mockPrisma.suggestion.findMany.mockResolvedValue([
+        { id: 'sug_1', discordMessageId: 'msg-1', discordThreadId: null },
+        { id: 'sug_2', discordMessageId: null, discordThreadId: 'thread-2' },
+        { id: 'sug_3', discordMessageId: null, discordThreadId: null },
+      ] as never);
+      mockPrisma.suggestion.deleteMany.mockResolvedValue({ count: 3 } as never);
+
+      const result = await service.bulkDelete('company-1', ['sug_1', 'sug_2', 'sug_3']);
+
+      expect(eventEmitter.emit).toHaveBeenCalledTimes(2);
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.deleted', {
+        companyId: 'company-1',
+        suggestionId: 'sug_1',
+        discordMessageId: 'msg-1',
+        discordThreadId: null,
+      });
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.deleted', {
+        companyId: 'company-1',
+        suggestionId: 'sug_2',
+        discordMessageId: null,
+        discordThreadId: 'thread-2',
+      });
+      expect(mockPrisma.suggestion.deleteMany).toHaveBeenCalledWith({
+        where: { id: { in: ['sug_1', 'sug_2', 'sug_3'] }, companyId: 'company-1' },
+      });
+      expect(result.deleted).toEqual(['sug_1', 'sug_2', 'sug_3']);
+    });
+
+    it('does not emit when no suggestions have discord ids', async () => {
+      mockPrisma.suggestion.findMany.mockResolvedValue([
+        { id: 'sug_1', discordMessageId: null, discordThreadId: null },
+      ] as never);
+      mockPrisma.suggestion.deleteMany.mockResolvedValue({ count: 1 } as never);
+
+      const result = await service.bulkDelete('company-1', ['sug_1']);
+
+      expect(eventEmitter.emit).not.toHaveBeenCalled();
+      expect(result.deleted).toEqual(['sug_1']);
     });
   });
 });
