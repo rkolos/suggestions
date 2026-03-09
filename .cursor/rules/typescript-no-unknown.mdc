@@ -1,0 +1,57 @@
+---
+description: Запрет на использование unknown в типах TypeScript
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Запрет на использование unknown
+
+Тип `unknown` в TypeScript — плохая практика: он отключает проверку типов и скрывает реальную структуру данных.
+
+## Правило
+
+**Не использовать `unknown`** в аннотациях типов. Вместо этого указывать конкретные типы.
+
+## Примеры
+
+```typescript
+// ❌ BAD
+function handle(data: unknown): Promise<unknown> {
+  return process(data);
+}
+
+// ✅ GOOD — конкретный тип
+function handle(data: UserInput): Promise<ProcessResult> {
+  return process(data);
+}
+```
+
+```typescript
+// ❌ BAD — возвращаемый тип unknown
+async function fetchUser(): Promise<unknown> {
+  return api.get('/user');
+}
+
+// ✅ GOOD — конкретный тип или void
+async function fetchUser(): Promise<User> {
+  return api.get('/user');
+}
+```
+
+```typescript
+// ❌ BAD — catch с unknown (если не перебрасываем)
+} catch (e: unknown) {
+  // e остаётся unknown без type guard
+}
+
+// ✅ GOOD — Error или конкретный тип
+} catch (e) {
+  const err = e instanceof Error ? e : new Error(String(e));
+  logger.error(err);
+}
+```
+
+## Исключения
+
+- `catch (e)` без аннотации — допустимо, если ошибка сразу перебрасывается или логируется
+- Внешние библиотеки, возвращающие `unknown` — оборачивать в type guard или утверждать тип на границе
