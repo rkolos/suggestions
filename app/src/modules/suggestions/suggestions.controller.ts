@@ -25,7 +25,9 @@ import { UpdateSuggestionStatusDto } from './dto/update-status.dto';
 import { VoteDto } from './dto/vote.dto';
 import { SimilarRequestDto } from './dto/similar-request.dto';
 import { AiIntegrationService } from '../ai-integration/ai-integration.service';
+import { CompanyConfigService } from '../config/company-config.service';
 import { SYSTEM_USER_ID } from '../../common/constants';
+import { SUGGESTIONS_CHANNEL_NOT_CONFIGURED_WARNING } from './constants';
 
 type SuggestionWithVotes = {
   id: string;
@@ -105,6 +107,7 @@ export class SuggestionsController {
     private readonly suggestionsService: SuggestionsService,
     private readonly votesService: VotesService,
     private readonly aiIntegrationService: AiIntegrationService,
+    private readonly configService: CompanyConfigService,
   ) {}
 
   @Get()
@@ -227,7 +230,11 @@ export class SuggestionsController {
 
   @Patch(':id/status')
   @ApiOperation({ summary: 'Изменение статуса предложения' })
-  @ApiResponse({ status: 200, description: 'Обновлённое предложение' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Updated suggestion. Optional `warning` when suggestions channel is not configured (Discord publish skipped).',
+  })
   @ApiResponse({ status: 404, description: 'Not found' })
   async updateStatus(
     @CurrentCompany() companyId: string,
@@ -240,7 +247,12 @@ export class SuggestionsController {
       body.status as never,
       body.comment,
     );
-    return toApiFormat(suggestion as unknown as SuggestionWithVotes);
+    const body_ = toApiFormat(suggestion as unknown as SuggestionWithVotes);
+    const config = await this.configService.getConfig(companyId);
+    if (!config.suggestionsChannelId?.trim()) {
+      return { ...body_, warning: SUGGESTIONS_CHANNEL_NOT_CONFIGURED_WARNING };
+    }
+    return body_;
   }
 
   @Delete(':id')

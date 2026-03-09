@@ -3,7 +3,9 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { CompanyIdGuard } from '../../common/guards/company-id.guard';
 import { CurrentCompany } from '../../common/decorators/current-company.decorator';
+import { CompanyConfigService } from '../config/company-config.service';
 import { SuggestionsService } from './suggestions.service';
+import { SUGGESTIONS_CHANNEL_NOT_CONFIGURED_WARNING } from './constants';
 import { BulkDeleteDto } from './dto/bulk-delete.dto';
 import { BulkUpdateStatusDto } from './dto/bulk-update-status.dto';
 import { BulkMergeDto } from './dto/bulk-merge.dto';
@@ -54,7 +56,10 @@ function toApiFormat(s: SuggestionWithVotes): Record<string, unknown> {
 @Controller('api/v1/suggestions/bulk')
 @UseGuards(CompanyIdGuard)
 export class BulkController {
-  constructor(private readonly suggestionsService: SuggestionsService) {}
+  constructor(
+    private readonly suggestionsService: SuggestionsService,
+    private readonly configService: CompanyConfigService,
+  ) {}
 
   @Post('delete')
   @ApiOperation({ summary: 'Массовое удаление' })
@@ -74,7 +79,11 @@ export class BulkController {
 
   @Post('status')
   @ApiOperation({ summary: 'Массовое изменение статуса' })
-  @ApiResponse({ status: 200, description: 'Успешно обновлено' })
+  @ApiResponse({
+    status: 200,
+    description:
+      'Updated. Optional `warning` when suggestions channel is not configured (Discord publish skipped).',
+  })
   @ApiResponse({ status: 207, description: 'Частичный успех' })
   async bulkUpdateStatus(
     @CurrentCompany() companyId: string,
@@ -83,6 +92,7 @@ export class BulkController {
   ): Promise<{
     updated: { id: string; suggestion: Record<string, unknown> }[];
     failed: { id: string; error: string }[];
+    warning?: string;
   }> {
     const result = await this.suggestionsService.bulkUpdateStatus(
       companyId,
@@ -92,13 +102,22 @@ export class BulkController {
     if (result.failed.length > 0) {
       res.status(207);
     }
-    return {
+    const config = await this.configService.getConfig(companyId);
+    const response: {
+      updated: { id: string; suggestion: Record<string, unknown> }[];
+      failed: { id: string; error: string }[];
+      warning?: string;
+    } = {
       updated: result.updated.map((u) => ({
         id: u.id,
         suggestion: toApiFormat(u.suggestion as unknown as SuggestionWithVotes),
       })),
       failed: result.failed,
     };
+    if (!config.suggestionsChannelId?.trim()) {
+      response.warning = SUGGESTIONS_CHANNEL_NOT_CONFIGURED_WARNING;
+    }
+    return response;
   }
 
   @Post('merge')

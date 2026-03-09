@@ -8,9 +8,17 @@ import { CommentsModule } from '../comments/comments.module';
 import { BansModule } from '../moderation/bans.module';
 import { VotesModule } from '../votes/votes.module';
 import { AiIntegrationModule } from '../ai-integration/ai-integration.module';
+import { CompanyConfigModule } from '../config/config.module';
 
 @Module({
-  imports: [PrismaModule, CommentsModule, BansModule, VotesModule, AiIntegrationModule],
+  imports: [
+    PrismaModule,
+    CommentsModule,
+    BansModule,
+    VotesModule,
+    AiIntegrationModule,
+    CompanyConfigModule,
+  ],
   controllers: [SuggestionsController, BulkController],
   providers: [SuggestionsService, SuggestionStatusChangedListener],
   exports: [SuggestionsService],
