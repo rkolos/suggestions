@@ -333,12 +333,20 @@ export class SuggestionsController {
   async discordPreview(
     @CurrentCompany() companyId: string,
     @Param('id') id: string,
+    @CurrentUser() userId: string | undefined,
   ): Promise<{ embeds: unknown[] }> {
-    const suggestion = await this.suggestionsService.findById(companyId, id);
+    const suggestion = await this.suggestionsService.findById(companyId, id, userId);
     const upvotes = (suggestion as SuggestionWithVotes).votes.filter((v) => v.type === 1).length;
     const downvotes = (suggestion as SuggestionWithVotes).votes.filter((v) => v.type === -1).length;
     const score = upvotes - downvotes;
     const statusTitle = suggestion.status.charAt(0) + suggestion.status.slice(1).toLowerCase();
+    let footerText = 'Suggestions';
+    if (userId != null) {
+      const userVote = (suggestion as SuggestionWithVotes).votes[0]?.type ?? null;
+      if (userVote != null) {
+        footerText += userVote === 1 ? ' • You: 👍' : ' • You: 👎';
+      }
+    }
     return {
       embeds: [
         {
@@ -349,7 +357,7 @@ export class SuggestionsController {
             { name: 'Status', value: statusTitle, inline: true },
             { name: 'Score', value: String(score), inline: true },
           ],
-          footer: { text: 'Suggestions' },
+          footer: { text: footerText },
         },
       ],
     };

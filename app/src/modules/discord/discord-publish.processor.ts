@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Injectable } from '@nestjs/common';
 import { Job } from 'bullmq';
-import { Client, EmbedBuilder, TextChannel } from 'discord.js';
+import { Client, TextChannel } from 'discord.js';
 import { PinoLogger } from 'nestjs-pino';
 import { SuggestionStatus } from '@prisma/client';
 import { CompanyConfigService } from '../config/company-config.service';
@@ -16,35 +16,8 @@ import {
   getNotificationTemplateKey,
   renderNotificationTemplate,
 } from './notification-template.util';
+import { buildSuggestionEmbed } from './suggestion-embed.util';
 import { buildVoteButtons } from './vote-buttons.util';
-
-const EMBED_DESCRIPTION_MAX_LENGTH = 4000;
-
-const STATUS_COLORS: Record<SuggestionStatus, number> = {
-  [SuggestionStatus.NEW]: 0x95a5a6,
-  [SuggestionStatus.OPEN]: 0xfee75c,
-  [SuggestionStatus.IN_PROGRESS]: 0x5865f2,
-  [SuggestionStatus.COMPLETED]: 0x57f287,
-  [SuggestionStatus.DUPLICATE]: 0x747f8d,
-  [SuggestionStatus.REJECTED]: 0xed4245,
-  [SuggestionStatus.PLANNED]: 0xeb459e,
-};
-
-const STATUS_LABELS: Record<SuggestionStatus, string> = {
-  [SuggestionStatus.NEW]: 'Under review',
-  [SuggestionStatus.OPEN]: 'Open for voting',
-  [SuggestionStatus.IN_PROGRESS]: 'In progress',
-  [SuggestionStatus.COMPLETED]: 'Completed',
-  [SuggestionStatus.DUPLICATE]: 'Duplicate',
-  [SuggestionStatus.REJECTED]: 'Rejected',
-  [SuggestionStatus.PLANNED]: 'Planned',
-};
-
-const VOTABLE_STATUSES: SuggestionStatus[] = [
-  SuggestionStatus.OPEN,
-  SuggestionStatus.PLANNED,
-  SuggestionStatus.IN_PROGRESS,
-];
 
 const SUGGESTION_DELETED_MESSAGE = 'Suggestion deleted';
 
@@ -109,13 +82,38 @@ export class DiscordPublishProcessor extends WorkerHost {
       }
 
       const textChannel = channel as TextChannel;
-      const embed = this.buildEmbed(suggestion);
 
-      const showVoteButtons = VOTABLE_STATUSES.includes(newStatus);
-      const { upvotes, downvotes } = showVoteButtons
-        ? await this.votesService.getVoteCounts(suggestionId)
-        : { upvotes: 0, downvotes: 0 };
-      const components = showVoteButtons ? buildVoteButtons(suggestionId, upvotes, downvotes) : [];
+      const isOpen = newStatus === SuggestionStatus.OPEN;
+      const isNew = newStatus === SuggestionStatus.NEW;
+      let upvotes = 0;
+      let downvotes = 0;
+      if (isOpen) {
+        const counts = await this.votesService.getVoteCounts(suggestionId);
+        upvotes = counts.upvotes;
+        downvotes = counts.downvotes;
+      } else if (!isNew) {
+        const counts = await this.votesService.getVoteCounts(suggestionId);
+        upvotes = counts.upvotes;
+        downvotes = counts.downvotes;
+      }
+
+      const embed = buildSuggestionEmbed(suggestion);
+      if (!isOpen) {
+        if (isNew) {
+          embed.addFields({
+            name: 'Voting',
+            value: 'Voting is not available in this status.',
+          });
+        } else {
+          const total = upvotes + downvotes;
+          embed.addFields({
+            name: 'Voting (closed)',
+            value: `Total: ${total} | 👍 ${upvotes} | 👎 ${downvotes}`,
+          });
+        }
+      }
+
+      const components = isOpen ? buildVoteButtons(suggestionId, upvotes, downvotes) : [];
 
       let effectiveThreadId: string | null = suggestion.discordThreadId ?? null;
       let messageId: string | null = null;
@@ -152,7 +150,12 @@ export class DiscordPublishProcessor extends WorkerHost {
       }
 
       const threadId = effectiveThreadId;
-      await this.sendStatusChangeNotifications(companyId, job.data, threadId, config);
+      await this.sendStatusChangeNotifications(
+        companyId,
+        job.data as DiscordPublishJobPayload,
+        threadId,
+        config,
+      );
 
       if (threadId) {
         try {
@@ -294,36 +297,6 @@ export class DiscordPublishProcessor extends WorkerHost {
         'Discord API error during delete',
       );
     }
-  }
-
-  private buildEmbed(suggestion: DiscordPublishJobPayload['suggestion']): EmbedBuilder {
-    const description =
-      suggestion.description.length > EMBED_DESCRIPTION_MAX_LENGTH
-        ? suggestion.description.slice(0, EMBED_DESCRIPTION_MAX_LENGTH - 3) + '...'
-        : suggestion.description;
-
-    const embed = new EmbedBuilder()
-      .setTitle(suggestion.title)
-      .setDescription(description)
-      .setColor(STATUS_COLORS[suggestion.status] ?? 0x95a5a6)
-      .setFooter({ text: STATUS_LABELS[suggestion.status] ?? suggestion.status })
-      .setTimestamp();
-
-    if (suggestion.author) {
-      embed.setAuthor({
-        name: suggestion.author.username,
-        iconURL: suggestion.author.avatarUrl ?? undefined,
-      });
-    }
-
-    if (suggestion.status === SuggestionStatus.DUPLICATE && suggestion.mergedIntoId) {
-      embed.addFields({
-        name: 'Original',
-        value: `Merged into suggestion \`${suggestion.mergedIntoId}\``,
-      });
-    }
-
-    return embed;
   }
 
   private async sendStatusChangeNotifications(

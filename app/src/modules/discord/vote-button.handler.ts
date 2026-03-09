@@ -5,13 +5,15 @@ import { PinoLogger } from 'nestjs-pino';
 import { appendDiscordBlockSync } from '../../common/dev-log/dev-debug-log.stream';
 import { DiscordCompany } from './decorators/discord-company.decorator';
 import { BansService } from '../moderation/bans.service';
+import { SuggestionsService } from '../suggestions/suggestions.service';
 import { UsersService } from '../users/users.service';
 import { VotesService } from '../votes/votes.service';
 import { VoteRateLimitService } from './vote-rate-limit.service';
+import { buildSuggestionEmbed } from './suggestion-embed.util';
 import { buildVoteButtons } from './vote-buttons.util';
 
-const RATE_LIMIT_MESSAGE = 'Пожалуйста, подождите пару секунд перед повторным голосованием';
-const BANNED_MESSAGE = 'Пользователь заблокирован';
+const RATE_LIMIT_MESSAGE = 'Please wait a few seconds before voting again';
+const BANNED_MESSAGE = 'User is banned';
 
 @Injectable()
 export class VoteButtonHandler {
@@ -20,6 +22,7 @@ export class VoteButtonHandler {
     private readonly usersService: UsersService,
     private readonly bansService: BansService,
     private readonly votesService: VotesService,
+    private readonly suggestionsService: SuggestionsService,
     private readonly logger: PinoLogger,
   ) {}
 
@@ -105,11 +108,27 @@ export class VoteButtonHandler {
       this.logger.info({ type: 'discord', ...discordLog });
       appendDiscordBlockSync(discordLog);
 
-      return interaction.update({
+      await interaction.update({
         components: buildVoteButtons(suggestionId, result.upvotes, result.downvotes),
       });
+
+      const suggestion = await this.suggestionsService.findById(companyId, suggestionId);
+      const embedInput = {
+        title: suggestion.title,
+        description: suggestion.description,
+        status: suggestion.status,
+        author: suggestion.author
+          ? { username: suggestion.author.username, avatarUrl: suggestion.author.avatarUrl }
+          : undefined,
+        mergedIntoId: suggestion.mergedIntoId ?? undefined,
+      };
+      const embed = buildSuggestionEmbed(embedInput, { userVote: result.userVote });
+      await interaction.followUp({
+        ephemeral: true,
+        embeds: [embed],
+      });
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Не удалось проголосовать';
+      const errorMessage = err instanceof Error ? err.message : 'Could not register vote';
       appendDiscordBlockSync({
         event: 'vote_button',
         companyId,
