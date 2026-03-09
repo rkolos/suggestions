@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SuggestionSource {
+  DISCORD
+  WEB
+}
+
+enum SuggestionStatus {
+  NEW
+  OPEN
+  DUPLICATE
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+}
+
+model CompanyConfig {
+  companyId             String        @id @db.Uuid
+  discordGuildId        String?       @unique
+  suggestionsChannelId  String?
+  categories            Json?         @default("[]")
+  notificationTemplates Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  suggestions Suggestion[]
+  bannedUsers BannedUser[]
+
+  @@map("companies_config")
+}
+
+model User {
+  id           String   @id
+  username     String
+  avatarUrl    String?
+  lastSyncedAt DateTime @default(now())
+
+  suggestions Suggestion[]
+  votes       Vote[]
+  comments    Comment[]
+
+  @@map("users")
+}
+
+model Suggestion {
+  id               String            @id
+  companyId        String            @db.Uuid
+  authorId         String
+  source           SuggestionSource  @default(WEB)
+  title            String
+  description      String            @db.Text
+  category         String
+  isOfficial       Boolean           @default(false)
+  status           SuggestionStatus  @default(NEW)
+  slug             String
+  discordMessageId String?
+  discordThreadId  String?
+  mergedIntoId     String?
+  ai_summary       String?           @db.Text
+  type             String?
+  isPinned         Boolean           @default(false)
+  images           String[]          @default([])
+  dismissedDuplicatesAt DateTime?    @map("dismissed_duplicates_at")
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  companyConfig CompanyConfig @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  mergedInto    Suggestion?   @relation("SuggestionMergedInto", fields: [mergedIntoId], references: [id])
+  duplicates    Suggestion[]  @relation("SuggestionMergedInto")
+  votes         Vote[]
+  comments      Comment[]
+
+  @@unique([companyId, slug])
+  @@index([companyId, status])
+  @@map("suggestions")
+}
+
+model Vote {
+  userId       String   @map("userId")
+  suggestionId String   @map("suggestionId")
+  type         Int
+  createdAt    DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  suggestion Suggestion  @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@id([userId, suggestionId])
+  @@map("votes")
+}
+
+model Comment {
+  id           String   @id @default(uuid()) @db.Uuid
+  suggestionId String
+  authorId     String
+  body         String   @db.Text
+  isInternal   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  author     User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model BannedUser {
+  companyId String   @db.Uuid
+  userId    String
+  bannedAt  DateTime @default(now())
+
+  company CompanyConfig @relation(fields: [companyId], references: [companyId], onDelete: Cascade)
+
+  @@id([companyId, userId])
+  @@map("banned_users")
+}

@@ -1,0 +1,795 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Сервис доступен"
+          }
+        },
+        "summary": "Проверка состояния сервиса",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/context": {
+      "get": {
+        "operationId": "ContextController_getContext",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Контекст текущего запроса"
+          }
+        },
+        "summary": "Контекст: companyId, userId",
+        "tags": [
+          "Context"
+        ]
+      }
+    },
+    "/api/v1/suggestions/config": {
+      "get": {
+        "operationId": "ConfigController_getConfig",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Настройки"
+          }
+        },
+        "summary": "Получение настроек (Categories, Notifications)",
+        "tags": [
+          "Config"
+        ]
+      },
+      "put": {
+        "operationId": "ConfigController_updateConfig",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConfigDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Обновлённые настройки"
+          }
+        },
+        "summary": "Обновление настроек",
+        "tags": [
+          "Config"
+        ]
+      }
+    },
+    "/api/v1/suggestions/config/defaults": {
+      "get": {
+        "operationId": "ConfigController_getDefaults",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Дефолтные настройки"
+          }
+        },
+        "summary": "Дефолтные шаблоны для Reset to Default",
+        "tags": [
+          "Config"
+        ]
+      }
+    },
+    "/api/v1/suggestions/settings/notifications": {
+      "get": {
+        "operationId": "NotificationsController_getNotifications",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Шаблоны уведомлений"
+          }
+        },
+        "summary": "Получение шаблонов уведомлений",
+        "tags": [
+          "Notifications"
+        ]
+      },
+      "put": {
+        "operationId": "NotificationsController_updateNotifications",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationTemplatesDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Обновлённые шаблоны"
+          }
+        },
+        "summary": "Обновление шаблонов уведомлений",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/suggestions": {
+      "get": {
+        "operationId": "SuggestionsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список предложений"
+          }
+        },
+        "summary": "Список предложений с фильтрами и пагинацией",
+        "tags": [
+          "Suggestions"
+        ]
+      },
+      "post": {
+        "operationId": "SuggestionsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSuggestionBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Созданное предложение"
+          },
+          "400": {
+            "description": "X-User-Id required"
+          }
+        },
+        "summary": "Создание предложения",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/stats": {
+      "get": {
+        "operationId": "SuggestionsController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Статистика по статусам"
+          }
+        },
+        "summary": "Счётчики по статусам",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{id}": {
+      "get": {
+        "operationId": "SuggestionsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Предложение"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Детальная панель предложения",
+        "tags": [
+          "Suggestions"
+        ]
+      },
+      "patch": {
+        "operationId": "SuggestionsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSuggestionBodyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Обновлённое предложение"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Обновление предложения (статус, категория)",
+        "tags": [
+          "Suggestions"
+        ]
+      },
+      "delete": {
+        "operationId": "SuggestionsController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Удалено"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Удаление предложения",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{id}/status": {
+      "patch": {
+        "operationId": "SuggestionsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSuggestionStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Обновлённое предложение"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Изменение статуса предложения",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/merge": {
+      "post": {
+        "operationId": "SuggestionsController_merge",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Результат слияния"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Слияние предложений (sourceId → targetId)",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{id}/vote": {
+      "post": {
+        "operationId": "SuggestionsController_vote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Результат голосования"
+          },
+          "400": {
+            "description": "X-User-Id required"
+          }
+        },
+        "summary": "Голосование upvote/downvote",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{id}/discord-preview": {
+      "get": {
+        "operationId": "SuggestionsController_discordPreview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Embed для Discord"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Discord Preview: payload/embed для предпросмотра",
+        "tags": [
+          "Suggestions"
+        ]
+      }
+    },
+    "/api/v1/suggestions/bulk/delete": {
+      "post": {
+        "operationId": "BulkController_bulkDelete",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkDeleteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешно удалено"
+          },
+          "207": {
+            "description": "Частичный успех (часть не удалена)"
+          }
+        },
+        "summary": "Массовое удаление",
+        "tags": [
+          "Bulk"
+        ]
+      }
+    },
+    "/api/v1/suggestions/bulk/status": {
+      "post": {
+        "operationId": "BulkController_bulkUpdateStatus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkUpdateStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешно обновлено"
+          },
+          "207": {
+            "description": "Частичный успех"
+          }
+        },
+        "summary": "Массовое изменение статуса",
+        "tags": [
+          "Bulk"
+        ]
+      }
+    },
+    "/api/v1/suggestions/bulk/merge": {
+      "post": {
+        "operationId": "BulkController_bulkMerge",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BulkMergeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешно слито"
+          },
+          "207": {
+            "description": "Частичный успех"
+          }
+        },
+        "summary": "Массовое слияние",
+        "tags": [
+          "Bulk"
+        ]
+      }
+    },
+    "/api/v1/suggestions/{suggestionId}/comments": {
+      "get": {
+        "operationId": "CommentsController_findBySuggestionId",
+        "parameters": [
+          {
+            "name": "suggestionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Список комментариев"
+          }
+        },
+        "summary": "Team Chat — список комментариев",
+        "tags": [
+          "Comments"
+        ]
+      },
+      "post": {
+        "operationId": "CommentsController_create",
+        "parameters": [
+          {
+            "name": "suggestionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Созданный комментарий"
+          },
+          "400": {
+            "description": "X-User-Id required"
+          }
+        },
+        "summary": "Team Chat — отправка комментария",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/api/v1/suggestions/comments/{commentId}": {
+      "patch": {
+        "operationId": "CommentsByIdController_update",
+        "parameters": [
+          {
+            "name": "commentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCommentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Обновлённый комментарий"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Редактирование комментария",
+        "tags": [
+          "Comments"
+        ]
+      },
+      "delete": {
+        "operationId": "CommentsByIdController_delete",
+        "parameters": [
+          {
+            "name": "commentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Удалено"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        },
+        "summary": "Удаление комментария",
+        "tags": [
+          "Comments"
+        ]
+      }
+    },
+    "/api/v1/suggestions/bans": {
+      "get": {
+        "operationId": "BansController_getBannedUsers[0]",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список забаненных"
+          }
+        },
+        "summary": "Список забаненных пользователей",
+        "tags": [
+          "Bans"
+        ]
+      },
+      "post": {
+        "operationId": "BansController_banUser[0]",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пользователь забанен"
+          }
+        },
+        "summary": "Ban пользователя",
+        "tags": [
+          "Bans"
+        ]
+      }
+    },
+    "/api/v1/suggestions/banned-users": {
+      "get": {
+        "operationId": "BansController_getBannedUsers[1]",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Список забаненных"
+          }
+        },
+        "summary": "Список забаненных пользователей",
+        "tags": [
+          "Bans"
+        ]
+      },
+      "post": {
+        "operationId": "BansController_banUser[1]",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BanUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Пользователь забанен"
+          }
+        },
+        "summary": "Ban пользователя",
+        "tags": [
+          "Bans"
+        ]
+      }
+    },
+    "/api/v1/suggestions/bans/{userId}": {
+      "delete": {
+        "operationId": "BansController_unbanUser[0]",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь разбанен"
+          }
+        },
+        "summary": "Unban пользователя",
+        "tags": [
+          "Bans"
+        ]
+      }
+    },
+    "/api/v1/suggestions/banned-users/{userId}": {
+      "delete": {
+        "operationId": "BansController_unbanUser[1]",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Пользователь разбанен"
+          }
+        },
+        "summary": "Unban пользователя",
+        "tags": [
+          "Bans"
+        ]
+      }
+    },
+    "/api/v1/users/me": {
+      "get": {
+        "operationId": "UsersController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Данные пользователя"
+          },
+          "400": {
+            "description": "X-User-Id required"
+          }
+        },
+        "summary": "Текущий пользователь: id, username, avatarUrl, role, permissions",
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Suggestions API",
+    "description": "API для управления предложениями (suggestions)",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {
+      "UpdateConfigDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "NotificationTemplatesDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateSuggestionBodyDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateSuggestionBodyDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateSuggestionStatusDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "VoteDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BulkDeleteDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BulkUpdateStatusDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BulkMergeDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateCommentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateCommentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BanUserDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  }
+}

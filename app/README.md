@@ -32,6 +32,16 @@
 $ npm install
 ```
 
+## Database seed
+
+Системный пользователь (`id = "system"`) создаётся через Prisma seed:
+
+```bash
+$ npx prisma db seed
+```
+
+Запускать при первом развёртывании или после сброса БД.
+
 ## Compile and run the project
 
 ```bash
@@ -47,11 +57,13 @@ $ npm run start:prod
 
 ## Run tests
 
+Для E2E-тестов должны быть запущены PostgreSQL и Redis (из корня репозитория: `docker compose up -d`). Подробнее — в [README в корне репозитория](../README.md#окружение-для-разработки-и-e2e).
+
 ```bash
 # unit tests
 $ npm run test
 
-# e2e tests
+# e2e tests (requires Postgres + Redis, e.g. docker compose up -d)
 $ npm run test:e2e
 
 # test coverage
