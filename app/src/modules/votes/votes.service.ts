@@ -3,11 +3,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { BansService } from '../moderation/bans.service';
 import { SuggestionStatus } from '@prisma/client';
 
-const VOTABLE_STATUSES: SuggestionStatus[] = [
-  SuggestionStatus.OPEN,
-  SuggestionStatus.PLANNED,
-  SuggestionStatus.IN_PROGRESS,
-];
+const VOTABLE_STATUSES: SuggestionStatus[] = [SuggestionStatus.OPEN];
 
 export interface ToggleVoteResult {
   upvotes: number;
@@ -62,12 +58,12 @@ export class VotesService {
     });
 
     if (!suggestion) {
-      throw new NotFoundException('Предложение не найдено');
+      throw new NotFoundException('Suggestion not found');
     }
 
     if (!VOTABLE_STATUSES.includes(suggestion.status)) {
       throw new NotFoundException(
-        `Голосование недоступно для предложения в статусе ${suggestion.status}`,
+        `Voting is not available for suggestions in status ${suggestion.status}`,
       );
     }
 
