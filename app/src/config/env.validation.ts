@@ -5,6 +5,7 @@ export interface EnvConfig {
   REDIS_URL: string;
   PORT: number;
   NODE_ENV: 'development' | 'production' | 'test';
+  AUTO_APPROVE?: string;
   DISCORD_BOT_TOKEN?: string;
   DISCORD_CLIENT_ID?: string;
   AI_SERVICE_URL?: string;
@@ -21,6 +22,7 @@ const baseSchema = Joi.object({
   }),
   PORT: Joi.number().default(4000),
   NODE_ENV: Joi.string().valid('development', 'production', 'test').default('development'),
+  AUTO_APPROVE: Joi.string().valid('true', 'false').optional().default('true'),
   DISCORD_BOT_TOKEN: Joi.string().allow(''),
   DISCORD_CLIENT_ID: Joi.string().allow(''),
   AI_SERVICE_URL: Joi.string().uri().allow(''),

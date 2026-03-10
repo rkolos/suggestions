@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { BansService } from '../moderation/bans.service';
@@ -10,6 +11,11 @@ import { SuggestionStatus } from '@prisma/client';
 describe('SuggestionsService', () => {
   let service: SuggestionsService;
   let eventEmitter: jest.Mocked<EventEmitter2>;
+  const mockConfigService = {
+    get: jest.fn<string | undefined, [string]>((key: string) =>
+      key === 'AUTO_APPROVE' ? 'true' : undefined,
+    ),
+  };
 
   const mockPrisma = {
     user: { upsert: jest.fn() },
@@ -29,11 +35,16 @@ describe('SuggestionsService', () => {
     const mockBansService = { assertNotBanned: jest.fn().mockResolvedValue(undefined) };
     const mockCommentsService = { create: jest.fn().mockResolvedValue({}) };
 
+    mockConfigService.get.mockImplementation((key: string) =>
+      key === 'AUTO_APPROVE' ? 'true' : undefined,
+    );
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SuggestionsService,
         { provide: PrismaService, useValue: mockPrisma },
         { provide: EventEmitter2, useValue: { emit: jest.fn() } },
+        { provide: ConfigService, useValue: mockConfigService },
         { provide: BansService, useValue: mockBansService },
         { provide: CommentsService, useValue: mockCommentsService },
       ],
@@ -133,6 +144,9 @@ describe('SuggestionsService', () => {
     });
 
     it('emits suggestion.created event', async () => {
+      mockConfigService.get.mockImplementation((key: string) =>
+        key === 'AUTO_APPROVE' ? 'false' : undefined,
+      );
       mockPrisma.suggestion.findFirst.mockResolvedValue(null);
       const created = { id: 'sug_xxx', companyId: 'company-1' };
       mockPrisma.suggestion.create.mockResolvedValue(created as never);
@@ -143,6 +157,76 @@ describe('SuggestionsService', () => {
         category: 'UI',
       });
 
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.created', created);
+    });
+
+    it('when AUTO_APPROVE is true, calls updateStatus(OPEN) and returns updated suggestion', async () => {
+      mockConfigService.get.mockImplementation((key: string) =>
+        key === 'AUTO_APPROVE' ? 'true' : undefined,
+      );
+      mockPrisma.suggestion.findFirst.mockResolvedValue(null);
+      const created = {
+        id: 'sug_auto',
+        companyId: 'company-1',
+        status: SuggestionStatus.NEW,
+        author: {},
+        votes: [],
+      };
+      const updated = { ...created, status: SuggestionStatus.OPEN };
+      mockPrisma.suggestion.create.mockResolvedValue(created as never);
+      mockPrisma.suggestion.findFirst
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(created as never);
+      mockPrisma.suggestion.update.mockResolvedValue(updated as never);
+
+      const result = await service.create('company-1', 'user-1', {
+        title: 'Test',
+        description: 'Desc',
+        category: 'UI',
+      });
+
+      expect(result.status).toBe(SuggestionStatus.OPEN);
+      expect(mockPrisma.suggestion.update).toHaveBeenCalledWith({
+        where: { id: 'sug_auto', companyId: 'company-1' },
+        data: { status: SuggestionStatus.OPEN },
+        include: { author: true, votes: true },
+      });
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.created', created);
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'suggestion.status.changed',
+        expect.objectContaining({
+          companyId: 'company-1',
+          suggestionId: 'sug_auto',
+          oldStatus: SuggestionStatus.NEW,
+          newStatus: SuggestionStatus.OPEN,
+        }),
+      );
+      expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.published', expect.any(Object));
+    });
+
+    it('when AUTO_APPROVE is false, does not call updateStatus and returns suggestion with NEW', async () => {
+      mockConfigService.get.mockImplementation((key: string) =>
+        key === 'AUTO_APPROVE' ? 'false' : undefined,
+      );
+      mockPrisma.suggestion.findFirst.mockResolvedValue(null);
+      const created = {
+        id: 'sug_manual',
+        companyId: 'company-1',
+        status: SuggestionStatus.NEW,
+        author: {},
+        votes: [],
+      };
+      mockPrisma.suggestion.create.mockResolvedValue(created as never);
+
+      const result = await service.create('company-1', 'user-1', {
+        title: 'Test',
+        description: 'Desc',
+        category: 'UI',
+      });
+
+      expect(result.status).toBe(SuggestionStatus.NEW);
+      expect(mockPrisma.suggestion.update).not.toHaveBeenCalled();
+      expect(eventEmitter.emit).toHaveBeenCalledTimes(1);
       expect(eventEmitter.emit).toHaveBeenCalledWith('suggestion.created', created);
     });
   });
