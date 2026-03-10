@@ -69,7 +69,7 @@ export class DiscordThreadSyncService {
       if (!threadChannel?.isThread?.()) {
         return;
       }
-      const text = `**[ОФИЦИАЛЬНЫЙ ОТВЕТ от @${comment.author.username}]**\n${comment.body}`;
+      const text = `**[OFFICIAL REPLY from @${comment.author.username}]**\n${comment.body}`;
       await threadChannel.send({ content: text });
       this.logger.info({
         type: 'discord',
@@ -111,7 +111,7 @@ export class DiscordThreadSyncService {
       if (!threadChannel?.isThread?.()) {
         return;
       }
-      const text = `Идея объединена с [${target.title}] (ID: \`${target.id}\`)`;
+      const text = `Suggestion merged with [${target.title}] (ID: \`${target.id}\`)`;
       await threadChannel.send({ content: text });
       this.logger.info({
         type: 'discord',

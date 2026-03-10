@@ -9,6 +9,7 @@ import {
 import { Ctx, StringSelect } from 'necord';
 import type { StringSelectMenuInteraction } from 'discord.js';
 import { CompanyConfigService } from '../../config/company-config.service';
+import { DISCORD_MESSAGES } from '../discord-messages.constants';
 
 const MODAL_PREFIX = 'suggest_modal';
 const MODAL_TITLE = 'New suggestion';
@@ -28,7 +29,7 @@ export class SuggestCategorySelectHandler {
     const companyId = (interaction as { companyId?: string }).companyId;
     if (!companyId) {
       await interaction.reply({
-        content: 'Error: server is not linked.',
+        content: DISCORD_MESSAGES.SERVER_NOT_SET_UP,
         ephemeral: true,
       });
       return;

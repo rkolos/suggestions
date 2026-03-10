@@ -397,7 +397,7 @@ export class SuggestionsService {
       companyId,
       targetId,
       SYSTEM_USER_ID,
-      `Идея объединена с [${target.id}]`,
+      `Suggestion merged with [${target.id}]`,
       true,
     );
 

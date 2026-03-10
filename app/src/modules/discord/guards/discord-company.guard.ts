@@ -2,11 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { NecordExecutionContext } from 'necord';
 import type { Interaction } from 'discord.js';
 import { CompanyConfigService } from '../../config/company-config.service';
-
-const DM_MESSAGE = 'Бот работает только на серверах. Вызовите команду на сервере Discord.';
-
-const UNREGISTERED_GUILD_MESSAGE =
-  'Этот сервер еще не настроен. Пожалуйста, обратитесь к администратору для привязки сервера в панели управления.';
+import { DISCORD_MESSAGES } from '../discord-messages.constants';
 
 export type InteractionWithCompany = Interaction & { companyId?: string };
 
@@ -38,7 +34,7 @@ export class DiscordCompanyGuard implements CanActivate {
     if (!guildId) {
       if (interaction.isRepliable()) {
         await interaction.reply({
-          content: DM_MESSAGE,
+          content: DISCORD_MESSAGES.DM_ONLY_SERVERS,
           ephemeral: true,
         });
       }
@@ -49,7 +45,7 @@ export class DiscordCompanyGuard implements CanActivate {
     if (!config) {
       if (interaction.isRepliable()) {
         await interaction.reply({
-          content: UNREGISTERED_GUILD_MESSAGE,
+          content: DISCORD_MESSAGES.SERVER_NOT_SET_UP,
           ephemeral: true,
         });
       }

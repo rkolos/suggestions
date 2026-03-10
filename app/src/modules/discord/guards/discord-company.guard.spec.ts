@@ -139,7 +139,7 @@ describe('DiscordCompanyGuard', () => {
     const result = await guard.canActivate(ctx);
     expect(result).toBe(false);
     expect(interaction.reply).toHaveBeenCalledWith({
-      content: 'Бот работает только на серверах. Вызовите команду на сервере Discord.',
+      content: 'This bot works on Discord servers only. Please run the command in a server.',
       ephemeral: true,
     });
     expect(companyConfigService.findByDiscordGuildId).not.toHaveBeenCalled();
@@ -154,7 +154,7 @@ describe('DiscordCompanyGuard', () => {
     expect(companyConfigService.findByDiscordGuildId).toHaveBeenCalledWith('guild-unknown');
     expect(interaction.reply).toHaveBeenCalledWith({
       content:
-        'Этот сервер еще не настроен. Пожалуйста, обратитесь к администратору для привязки сервера в панели управления.',
+        'This server is not set up yet. Please ask an administrator to link this server in the dashboard.',
       ephemeral: true,
     });
   });

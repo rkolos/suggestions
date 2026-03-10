@@ -13,7 +13,7 @@ describe('Corde: Scenario 5 — Admin Comments', () => {
   let channelId: string;
   let suggestionId: string;
   let threadId: string;
-  const commentText = 'Corde: Официальный ответ админа для теста';
+  const commentText = 'Corde: Official admin reply for test';
 
   beforeAll(async () => {
     client = await createDiscordClient();
@@ -72,7 +72,7 @@ describe('Corde: Scenario 5 — Admin Comments', () => {
     expect(res.status).toBe(201);
   });
 
-  it('5.2 проверка: в Thread появилось сообщение с [ОФИЦИАЛЬНЫЙ ОТВЕТ]', async () => {
+  it('5.2 check: thread contains message with [OFFICIAL REPLY]', async () => {
     if (!threadId) {
       return; // skip: 5.0 failed
     }
@@ -85,7 +85,7 @@ describe('Corde: Scenario 5 — Admin Comments', () => {
       const contents = [...messages.values()]
         .map((m) => m.content ?? '')
         .filter((c): c is string => typeof c === 'string' && c.length > 0);
-      found = contents.some((c) => c.includes('[ОФИЦИАЛЬНЫЙ ОТВЕТ') && c.includes(commentText));
+      found = contents.some((c) => c.includes('[OFFICIAL REPLY') && c.includes(commentText));
       if (found) break;
     }
     expect(found).toBe(true);
