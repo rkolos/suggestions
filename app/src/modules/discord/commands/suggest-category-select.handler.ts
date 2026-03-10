@@ -27,7 +27,17 @@ export class SuggestCategorySelectHandler {
     @Ctx() [interaction]: [StringSelectMenuInteraction],
   ): Promise<void> {
     const companyId = (interaction as { companyId?: string }).companyId;
-    if (!companyId) {
+    const guildId = interaction.guildId ?? interaction.guild?.id;
+    if (!companyId || !guildId) {
+      await interaction.reply({
+        content: DISCORD_MESSAGES.SERVER_NOT_SET_UP,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const linkedConfig = await this.companyConfigService.findByDiscordGuildId(guildId);
+    if (!linkedConfig || linkedConfig.companyId !== companyId) {
       await interaction.reply({
         content: DISCORD_MESSAGES.SERVER_NOT_SET_UP,
         ephemeral: true,
