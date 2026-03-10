@@ -74,6 +74,38 @@ describe('SuggestionsService', () => {
     });
   });
 
+  describe('findByDiscordThreadId', () => {
+    it('throws NotFoundException when no suggestion for thread', async () => {
+      mockPrisma.suggestion.findFirst.mockResolvedValue(null);
+
+      await expect(service.findByDiscordThreadId('company-1', 'thread-123')).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockPrisma.suggestion.findFirst).toHaveBeenCalledWith({
+        where: { companyId: 'company-1', discordThreadId: 'thread-123' },
+        include: { author: true, votes: true },
+      });
+    });
+
+    it('returns suggestion when found by thread id', async () => {
+      const mockSuggestion = {
+        id: 'sug_xyz',
+        companyId: 'company-1',
+        discordThreadId: 'thread-123',
+        author: {},
+        votes: [],
+      };
+      mockPrisma.suggestion.findFirst.mockResolvedValue(mockSuggestion);
+
+      const result = await service.findByDiscordThreadId('company-1', 'thread-123');
+      expect(result).toEqual(mockSuggestion);
+      expect(mockPrisma.suggestion.findFirst).toHaveBeenCalledWith({
+        where: { companyId: 'company-1', discordThreadId: 'thread-123' },
+        include: { author: true, votes: true },
+      });
+    });
+  });
+
   describe('create', () => {
     it('calls ensureUser before create', async () => {
       mockPrisma.suggestion.findFirst.mockResolvedValue(null);

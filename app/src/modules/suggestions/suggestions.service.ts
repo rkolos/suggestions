@@ -242,6 +242,25 @@ export class SuggestionsService {
     return suggestion;
   }
 
+  async findByDiscordThreadId(
+    companyId: string,
+    discordThreadId: string,
+  ): Promise<Prisma.SuggestionGetPayload<{ include: { author: true; votes: true } }>> {
+    const suggestion = await this.prisma.suggestion.findFirst({
+      where: { companyId, discordThreadId },
+      include: {
+        author: true,
+        votes: true,
+      },
+    });
+
+    if (!suggestion) {
+      throw new NotFoundException('Suggestion not found for this thread.');
+    }
+
+    return suggestion;
+  }
+
   async findByIds(
     companyId: string,
     ids: string[],
