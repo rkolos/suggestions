@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Button, ComponentParam, Ctx } from 'necord';
 import type { ButtonInteraction, InteractionResponse } from 'discord.js';
+import { SuggestionStatus } from '@prisma/client';
 import { PinoLogger } from 'nestjs-pino';
 import { appendDiscordBlockSync } from '../../common/dev-log/dev-debug-log.stream';
+import { CompanyConfigService } from '../config/company-config.service';
 import { DiscordCompany } from './decorators/discord-company.decorator';
 import { BansService } from '../moderation/bans.service';
 import { SuggestionsService } from '../suggestions/suggestions.service';
@@ -23,6 +25,7 @@ export class VoteButtonHandler {
     private readonly bansService: BansService,
     private readonly votesService: VotesService,
     private readonly suggestionsService: SuggestionsService,
+    private readonly companyConfigService: CompanyConfigService,
     private readonly logger: PinoLogger,
   ) {}
 
@@ -113,6 +116,16 @@ export class VoteButtonHandler {
       });
 
       const suggestion = await this.suggestionsService.findById(companyId, suggestionId);
+      let mergedIntoMessageUrl: string | undefined;
+      if (suggestion.status === SuggestionStatus.DUPLICATE && suggestion.mergedIntoId != null) {
+        const target = await this.suggestionsService.findById(companyId, suggestion.mergedIntoId);
+        const config = await this.companyConfigService.getConfig(companyId);
+        const guildId = config.discordGuildId;
+        const channelId = config.suggestionsChannelId;
+        if (target.discordMessageId && guildId && channelId) {
+          mergedIntoMessageUrl = `https://discord.com/channels/${guildId}/${channelId}/${target.discordMessageId}`;
+        }
+      }
       const embedInput = {
         title: suggestion.title,
         description: suggestion.description,
@@ -121,6 +134,7 @@ export class VoteButtonHandler {
           ? { username: suggestion.author.username, avatarUrl: suggestion.author.avatarUrl }
           : undefined,
         mergedIntoId: suggestion.mergedIntoId ?? undefined,
+        mergedIntoMessageUrl,
       };
       const embed = buildSuggestionEmbed(embedInput, { userVote: result.userVote });
       await interaction.followUp({

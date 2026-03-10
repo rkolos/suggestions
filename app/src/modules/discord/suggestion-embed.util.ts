@@ -30,6 +30,8 @@ export interface SuggestionEmbedInput {
   status: SuggestionStatus;
   author?: { username: string; avatarUrl: string | null };
   mergedIntoId?: string | null;
+  /** URL to the target suggestion's Discord message (for DUPLICATE embed link). */
+  mergedIntoMessageUrl?: string | null;
 }
 
 export interface BuildSuggestionEmbedOptions {
@@ -71,9 +73,12 @@ export function buildSuggestionEmbed(
   }
 
   if (suggestion.status === SuggestionStatus.DUPLICATE && suggestion.mergedIntoId) {
+    const value = suggestion.mergedIntoMessageUrl
+      ? `Merged into [suggestion \`${suggestion.mergedIntoId}\`](${suggestion.mergedIntoMessageUrl})`
+      : `Merged into suggestion \`${suggestion.mergedIntoId}\``;
     embed.addFields({
       name: 'Original',
-      value: `Merged into suggestion \`${suggestion.mergedIntoId}\``,
+      value,
     });
   }
 

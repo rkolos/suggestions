@@ -41,7 +41,8 @@ export class DiscordPublishProcessor extends WorkerHost {
       return;
     }
 
-    const { companyId, suggestionId, suggestion, newStatus } = job.data as DiscordPublishJobPayload;
+    const { companyId, suggestionId, suggestion, newStatus, mergedInto } =
+      job.data as DiscordPublishJobPayload;
 
     try {
       const config = await this.companyConfigService.getConfig(companyId);
@@ -97,7 +98,17 @@ export class DiscordPublishProcessor extends WorkerHost {
         downvotes = counts.downvotes;
       }
 
-      const embed = buildSuggestionEmbed(suggestion);
+      const guildId = config.discordGuildId;
+      const channelId = config.suggestionsChannelId;
+      const mergedIntoMessageUrl =
+        suggestion.status === SuggestionStatus.DUPLICATE &&
+        mergedInto?.discordMessageId &&
+        guildId &&
+        channelId
+          ? `https://discord.com/channels/${guildId}/${channelId}/${mergedInto.discordMessageId}`
+          : undefined;
+      const embedInput = { ...suggestion, mergedIntoMessageUrl };
+      const embed = buildSuggestionEmbed(embedInput);
       if (!isOpen) {
         if (isNew) {
           embed.addFields({
