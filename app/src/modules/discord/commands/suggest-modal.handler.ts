@@ -7,6 +7,7 @@ import { DiscordCompany } from '../decorators/discord-company.decorator';
 import { CompanyConfigService } from '../../config/company-config.service';
 import { SuggestionsService } from '../../suggestions/suggestions.service';
 import { UsersService } from '../../users/users.service';
+import { formatSuggestionLine, MY_STATUS_HINT } from '../my-status-report.util';
 
 type CategoryOption = { id: string; label: string; color: string };
 
@@ -66,9 +67,18 @@ export class SuggestModalHandler {
     this.logger.info({ type: 'discord', ...discordLog });
     appendDiscordBlockSync(discordLog);
 
+    const reportLine = formatSuggestionLine({
+      id: suggestion.id,
+      title: suggestion.title,
+      status: suggestion.status,
+      createdAt: suggestion.createdAt,
+      upvotes: 0,
+      downvotes: 0,
+    });
+    const content = `${reportLine}\n\n${MY_STATUS_HINT}`;
+
     return interaction.reply({
-      content:
-        'Your suggestion was submitted successfully. It is under moderation and will appear in the channel after an admin approves it.',
+      content,
       ephemeral: true,
     });
   }

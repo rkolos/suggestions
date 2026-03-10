@@ -14,6 +14,7 @@ import { BanCommand } from './commands/ban.command';
 import { SuggestCommand } from './commands/suggest.command';
 import { SuggestCategorySelectHandler } from './commands/suggest-category-select.handler';
 import { SuggestModalHandler } from './commands/suggest-modal.handler';
+import { MyStatusCommand } from './commands/my-status.command';
 import { DiscordPublishService, DISCORD_PUBLISH_QUEUE } from './discord-publish.service';
 import { DiscordPublishProcessor } from './discord-publish.processor';
 import { DiscordThreadSyncService } from './discord-thread-sync.service';
@@ -54,6 +55,7 @@ const necordModule = NecordModule.forRootAsync({
     SuggestCommand,
     SuggestCategorySelectHandler,
     SuggestModalHandler,
+    MyStatusCommand,
     DiscordPublishService,
     DiscordPublishProcessor,
     DiscordThreadSyncService,
