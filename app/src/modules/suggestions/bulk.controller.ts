@@ -62,9 +62,9 @@ export class BulkController {
   ) {}
 
   @Post('delete')
-  @ApiOperation({ summary: 'Массовое удаление' })
-  @ApiResponse({ status: 200, description: 'Успешно удалено' })
-  @ApiResponse({ status: 207, description: 'Частичный успех (часть не удалена)' })
+  @ApiOperation({ summary: 'Bulk delete' })
+  @ApiResponse({ status: 200, description: 'Successfully deleted' })
+  @ApiResponse({ status: 207, description: 'Partial success (some not deleted)' })
   async bulkDelete(
     @CurrentCompany() companyId: string,
     @Body() body: BulkDeleteDto,
@@ -78,13 +78,13 @@ export class BulkController {
   }
 
   @Post('status')
-  @ApiOperation({ summary: 'Массовое изменение статуса' })
+  @ApiOperation({ summary: 'Bulk status change' })
   @ApiResponse({
     status: 200,
     description:
       'Updated. Optional `warning` when suggestions channel is not configured (Discord publish skipped).',
   })
-  @ApiResponse({ status: 207, description: 'Частичный успех' })
+  @ApiResponse({ status: 207, description: 'Partial success' })
   async bulkUpdateStatus(
     @CurrentCompany() companyId: string,
     @Body() body: BulkUpdateStatusDto,
@@ -121,9 +121,9 @@ export class BulkController {
   }
 
   @Post('merge')
-  @ApiOperation({ summary: 'Массовое слияние' })
-  @ApiResponse({ status: 200, description: 'Успешно слито' })
-  @ApiResponse({ status: 207, description: 'Частичный успех' })
+  @ApiOperation({ summary: 'Bulk merge' })
+  @ApiResponse({ status: 200, description: 'Successfully merged' })
+  @ApiResponse({ status: 207, description: 'Partial success' })
   async bulkMerge(
     @CurrentCompany() companyId: string,
     @Body() body: BulkMergeDto,

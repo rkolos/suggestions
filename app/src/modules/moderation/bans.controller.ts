@@ -20,8 +20,8 @@ export class BansController {
   constructor(private readonly bansService: BansService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Список забаненных пользователей' })
-  @ApiResponse({ status: 200, description: 'Список забаненных' })
+  @ApiOperation({ summary: 'List banned users' })
+  @ApiResponse({ status: 200, description: 'List of banned users' })
   async getBannedUsers(
     @CurrentCompany() companyId: string,
     @Query() query: PaginationQueryDto,
@@ -30,8 +30,8 @@ export class BansController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Ban пользователя' })
-  @ApiResponse({ status: 200, description: 'Пользователь забанен' })
+  @ApiOperation({ summary: 'Ban user' })
+  @ApiResponse({ status: 200, description: 'User banned' })
   async banUser(
     @CurrentCompany() companyId: string,
     @Body() body: BanUserDto,
@@ -41,8 +41,8 @@ export class BansController {
   }
 
   @Delete(':userId')
-  @ApiOperation({ summary: 'Unban пользователя' })
-  @ApiResponse({ status: 200, description: 'Пользователь разбанен' })
+  @ApiOperation({ summary: 'Unban user' })
+  @ApiResponse({ status: 200, description: 'User unbanned' })
   async unbanUser(
     @CurrentCompany() companyId: string,
     @Param('userId') userId: string,

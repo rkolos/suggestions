@@ -12,8 +12,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('me')
-  @ApiOperation({ summary: 'Текущий пользователь: id, username, avatarUrl, role, permissions' })
-  @ApiResponse({ status: 200, description: 'Данные пользователя' })
+  @ApiOperation({ summary: 'Current user: id, username, avatarUrl, role, permissions' })
+  @ApiResponse({ status: 200, description: 'User data' })
   @ApiResponse({ status: 400, description: 'X-User-Id required' })
   async getMe(
     @CurrentCompany() companyId: string,

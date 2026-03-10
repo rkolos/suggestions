@@ -9,8 +9,8 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 @UseGuards(CompanyIdGuard)
 export class ContextController {
   @Get()
-  @ApiOperation({ summary: 'Контекст: companyId, userId' })
-  @ApiResponse({ status: 200, description: 'Контекст текущего запроса' })
+  @ApiOperation({ summary: 'Context: companyId, userId' })
+  @ApiResponse({ status: 200, description: 'Current request context' })
   getContext(
     @CurrentCompany() companyId: string,
     @CurrentUser() userId?: string,

@@ -2,7 +2,7 @@ import { IsBoolean, IsOptional, IsString, MinLength } from 'class-validator';
 
 export class CreateCommentDto {
   @IsString()
-  @MinLength(1, { message: 'Комментарий не может быть пустым' })
+  @MinLength(1, { message: 'Comment cannot be empty' })
   body!: string;
 
   @IsOptional()

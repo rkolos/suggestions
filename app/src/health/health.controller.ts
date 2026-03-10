@@ -10,8 +10,8 @@ interface HealthResponse {
 @Controller('health')
 export class HealthController {
   @Get()
-  @ApiOperation({ summary: 'Проверка состояния сервиса' })
-  @ApiResponse({ status: 200, description: 'Сервис доступен' })
+  @ApiOperation({ summary: 'Health check' })
+  @ApiResponse({ status: 200, description: 'Service available' })
   check(): HealthResponse {
     return {
       status: 'ok',

@@ -111,8 +111,8 @@ export class SuggestionsController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Список предложений с фильтрами и пагинацией' })
-  @ApiResponse({ status: 200, description: 'Список предложений' })
+  @ApiOperation({ summary: 'List suggestions with filters and pagination' })
+  @ApiResponse({ status: 200, description: 'List of suggestions' })
   async findAll(
     @CurrentCompany() companyId: string,
     @CurrentUser() userId: string | undefined,
@@ -140,8 +140,8 @@ export class SuggestionsController {
   }
 
   @Get('stats')
-  @ApiOperation({ summary: 'Счётчики по статусам' })
-  @ApiResponse({ status: 200, description: 'Статистика по статусам' })
+  @ApiOperation({ summary: 'Counts by status' })
+  @ApiResponse({ status: 200, description: 'Statistics by status' })
   async getStats(
     @CurrentCompany() companyId: string,
   ): Promise<{ total: number; byStatus: Record<string, number> }> {
@@ -149,8 +149,8 @@ export class SuggestionsController {
   }
 
   @Get(':id/duplicates')
-  @ApiOperation({ summary: 'Похожие предложения для вкладки Duplicates' })
-  @ApiResponse({ status: 200, description: 'Список похожих или dismissed: true' })
+  @ApiOperation({ summary: 'Similar suggestions for Duplicates tab' })
+  @ApiResponse({ status: 200, description: 'List of similar or dismissed: true' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async getDuplicates(
     @CurrentCompany() companyId: string,
@@ -174,8 +174,8 @@ export class SuggestionsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Детальная панель предложения' })
-  @ApiResponse({ status: 200, description: 'Предложение' })
+  @ApiOperation({ summary: 'Suggestion detail panel' })
+  @ApiResponse({ status: 200, description: 'Suggestion' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async findById(
     @CurrentCompany() companyId: string,
@@ -187,8 +187,8 @@ export class SuggestionsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Создание предложения' })
-  @ApiResponse({ status: 201, description: 'Созданное предложение' })
+  @ApiOperation({ summary: 'Create suggestion' })
+  @ApiResponse({ status: 201, description: 'Created suggestion' })
   @ApiResponse({ status: 400, description: 'X-User-Id required' })
   async create(
     @CurrentCompany() companyId: string,
@@ -211,8 +211,8 @@ export class SuggestionsController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Обновление предложения (статус, категория)' })
-  @ApiResponse({ status: 200, description: 'Обновлённое предложение' })
+  @ApiOperation({ summary: 'Update suggestion (status, category)' })
+  @ApiResponse({ status: 200, description: 'Updated suggestion' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async update(
     @CurrentCompany() companyId: string,
@@ -229,7 +229,7 @@ export class SuggestionsController {
   }
 
   @Patch(':id/status')
-  @ApiOperation({ summary: 'Изменение статуса предложения' })
+  @ApiOperation({ summary: 'Change suggestion status' })
   @ApiResponse({
     status: 200,
     description:
@@ -256,16 +256,16 @@ export class SuggestionsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Удаление предложения' })
-  @ApiResponse({ status: 200, description: 'Удалено' })
+  @ApiOperation({ summary: 'Delete suggestion' })
+  @ApiResponse({ status: 200, description: 'Deleted' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async delete(@CurrentCompany() companyId: string, @Param('id') id: string): Promise<void> {
     await this.suggestionsService.delete(companyId, id);
   }
 
   @Post('similar')
-  @ApiOperation({ summary: 'Поиск похожих предложений по тексту (модалка создания)' })
-  @ApiResponse({ status: 200, description: 'Массив похожих предложений' })
+  @ApiOperation({ summary: 'Search similar suggestions by text (create modal)' })
+  @ApiResponse({ status: 200, description: 'Array of similar suggestions' })
   async findSimilar(
     @CurrentCompany() companyId: string,
     @CurrentUser() userId: string | undefined,
@@ -278,8 +278,8 @@ export class SuggestionsController {
   }
 
   @Post('merge')
-  @ApiOperation({ summary: 'Слияние предложений (sourceId → targetId)' })
-  @ApiResponse({ status: 200, description: 'Результат слияния' })
+  @ApiOperation({ summary: 'Merge suggestions (sourceId → targetId)' })
+  @ApiResponse({ status: 200, description: 'Merge result' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async merge(
     @CurrentCompany() companyId: string,
@@ -299,7 +299,7 @@ export class SuggestionsController {
 
   @Post(':id/dismiss-duplicates')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Отклонение блока "похожие" (кнопка "Похожих нет")' })
+  @ApiOperation({ summary: 'Dismiss similar block (No similar button)' })
   @ApiResponse({ status: 204, description: 'No Content' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async dismissDuplicates(
@@ -310,8 +310,8 @@ export class SuggestionsController {
   }
 
   @Post(':id/vote')
-  @ApiOperation({ summary: 'Голосование upvote/downvote' })
-  @ApiResponse({ status: 200, description: 'Результат голосования' })
+  @ApiOperation({ summary: 'Vote upvote/downvote' })
+  @ApiResponse({ status: 200, description: 'Vote result' })
   @ApiResponse({ status: 400, description: 'X-User-Id required' })
   async vote(
     @CurrentCompany() companyId: string,
@@ -327,8 +327,8 @@ export class SuggestionsController {
   }
 
   @Get(':id/discord-preview')
-  @ApiOperation({ summary: 'Discord Preview: payload/embed для предпросмотра' })
-  @ApiResponse({ status: 200, description: 'Embed для Discord' })
+  @ApiOperation({ summary: 'Discord Preview: payload/embed for preview' })
+  @ApiResponse({ status: 200, description: 'Embed for Discord' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async discordPreview(
     @CurrentCompany() companyId: string,

@@ -54,15 +54,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       if (prismaError.code === 'P2002') {
         status = HttpStatus.CONFLICT;
         code = 'DUPLICATE_ENTRY';
-        message = 'Запись с такими данными уже существует';
+        message = 'A record with such data already exists';
       } else if (prismaError.code === 'P2025') {
         status = HttpStatus.NOT_FOUND;
         code = 'RECORD_NOT_FOUND';
-        message = 'Запись не найдена';
+        message = 'Record not found';
       } else {
         status = HttpStatus.INTERNAL_SERVER_ERROR;
         code = 'INTERNAL_ERROR';
-        message = 'Внутренняя ошибка сервера';
+        message = 'Internal server error';
         this.logger.error(
           `Prisma error ${prismaError.code}: ${prismaError.message}`,
           prismaError.stack,
@@ -71,7 +71,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       code = 'INTERNAL_ERROR';
-      message = 'Внутренняя ошибка сервера';
+      message = 'Internal server error';
       const err = exception instanceof Error ? exception : new Error(String(exception));
       this.logger.error(err.message, err.stack);
     }

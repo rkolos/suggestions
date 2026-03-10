@@ -32,8 +32,8 @@ export class CommentsController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Team Chat — список комментариев' })
-  @ApiResponse({ status: 200, description: 'Список комментариев' })
+  @ApiOperation({ summary: 'Team Chat — list comments' })
+  @ApiResponse({ status: 200, description: 'List of comments' })
   async findBySuggestionId(
     @CurrentCompany() companyId: string,
     @Param('suggestionId') suggestionId: string,
@@ -48,8 +48,8 @@ export class CommentsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Team Chat — отправка комментария' })
-  @ApiResponse({ status: 201, description: 'Созданный комментарий' })
+  @ApiOperation({ summary: 'Team Chat — post comment' })
+  @ApiResponse({ status: 201, description: 'Created comment' })
   @ApiResponse({ status: 400, description: 'X-User-Id required' })
   async create(
     @CurrentCompany() companyId: string,

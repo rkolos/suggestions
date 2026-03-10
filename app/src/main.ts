@@ -18,7 +18,7 @@ async function bootstrap(): Promise<void> {
 
   const config = new DocumentBuilder()
     .setTitle('Suggestions API')
-    .setDescription('API для управления предложениями (suggestions)')
+    .setDescription('API for managing suggestions')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);

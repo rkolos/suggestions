@@ -12,8 +12,8 @@ export class ConfigController {
   constructor(private readonly configService: CompanyConfigService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Получение настроек (Categories, Notifications)' })
-  @ApiResponse({ status: 200, description: 'Настройки' })
+  @ApiOperation({ summary: 'Get settings (Categories, Notifications)' })
+  @ApiResponse({ status: 200, description: 'Settings' })
   getConfig(@CurrentCompany() companyId: string): Promise<{
     categories: unknown[];
     notifications: Record<string, string>;
@@ -24,8 +24,8 @@ export class ConfigController {
   }
 
   @Put()
-  @ApiOperation({ summary: 'Обновление настроек' })
-  @ApiResponse({ status: 200, description: 'Обновлённые настройки' })
+  @ApiOperation({ summary: 'Update settings' })
+  @ApiResponse({ status: 200, description: 'Updated settings' })
   updateConfig(
     @CurrentCompany() companyId: string,
     @Body() body: UpdateConfigDto,
@@ -39,8 +39,8 @@ export class ConfigController {
   }
 
   @Get('defaults')
-  @ApiOperation({ summary: 'Дефолтные шаблоны для Reset to Default' })
-  @ApiResponse({ status: 200, description: 'Дефолтные настройки' })
+  @ApiOperation({ summary: 'Default templates for Reset to Default' })
+  @ApiResponse({ status: 200, description: 'Default settings' })
   getDefaults(): {
     categories: { id: string; label: string; color: string }[];
     notifications: Record<string, string>;

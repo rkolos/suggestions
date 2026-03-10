@@ -25,7 +25,7 @@ export class CommentsService {
     });
 
     if (!suggestion) {
-      throw new NotFoundException('Предложение не найдено');
+      throw new NotFoundException('Suggestion not found');
     }
 
     const comment = await this.prisma.comment.create({
@@ -65,7 +65,7 @@ export class CommentsService {
     });
 
     if (!suggestion) {
-      throw new NotFoundException('Предложение не найдено');
+      throw new NotFoundException('Suggestion not found');
     }
 
     const take = Math.min(MAX_LIMIT, Math.max(1, limit));
@@ -96,7 +96,7 @@ export class CommentsService {
     });
 
     if (!comment || comment.suggestion.companyId !== companyId) {
-      throw new NotFoundException('Комментарий не найден');
+      throw new NotFoundException('Comment not found');
     }
 
     return this.prisma.comment.update({
@@ -113,7 +113,7 @@ export class CommentsService {
     });
 
     if (!comment || comment.suggestion.companyId !== companyId) {
-      throw new NotFoundException('Комментарий не найден');
+      throw new NotFoundException('Comment not found');
     }
 
     await this.prisma.comment.delete({

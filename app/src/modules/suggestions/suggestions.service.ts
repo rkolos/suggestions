@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { BansService } from '../moderation/bans.service';
@@ -20,6 +21,7 @@ export class SuggestionsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly configService: ConfigService,
     private readonly bansService: BansService,
     private readonly commentsService: CommentsService,
   ) {}
@@ -104,6 +106,11 @@ export class SuggestionsService {
     });
 
     this.eventEmitter.emit('suggestion.created', suggestion);
+
+    const autoApprove = this.configService.get<string>('AUTO_APPROVE') !== 'false';
+    if (autoApprove && suggestion.status === SuggestionStatus.NEW) {
+      return this.updateStatus(companyId, suggestion.id, SuggestionStatus.OPEN);
+    }
     return suggestion;
   }
 
@@ -216,7 +223,7 @@ export class SuggestionsService {
     });
 
     if (!suggestion) {
-      throw new NotFoundException('Предложение не найдено');
+      throw new NotFoundException('Suggestion not found');
     }
 
     if (useOptimizedPath) {
@@ -378,7 +385,7 @@ export class SuggestionsService {
     targetId: string,
   ): Promise<Prisma.SuggestionGetPayload<{ include: { author: true; votes: true } }>> {
     if (sourceId === targetId) {
-      throw new NotFoundException('Нельзя слить предложение само с собой');
+      throw new NotFoundException('Cannot merge a suggestion with itself');
     }
 
     const [source, target] = await Promise.all([
@@ -392,15 +399,15 @@ export class SuggestionsService {
     ]);
 
     if (!source || !target) {
-      throw new NotFoundException('Одно или оба предложения не найдены');
+      throw new NotFoundException('One or both suggestions not found');
     }
 
     if (source.status === SuggestionStatus.DUPLICATE || source.mergedIntoId) {
-      throw new NotFoundException('Предложение-источник уже является дубликатом');
+      throw new NotFoundException('Source suggestion is already a duplicate');
     }
 
     if (target.status === SuggestionStatus.DUPLICATE || target.mergedIntoId) {
-      throw new NotFoundException('Нельзя слить в предложение-дубликат');
+      throw new NotFoundException('Cannot merge into a duplicate suggestion');
     }
 
     const updatedSource = await this.prisma.suggestion.update({
@@ -636,7 +643,7 @@ export class SuggestionsService {
     target?: Prisma.SuggestionGetPayload<{ include: { author: true; votes: true } }>;
   }> {
     if (sourceIds.includes(targetId)) {
-      throw new BadRequestException('targetId не должен входить в sourceIds');
+      throw new BadRequestException('targetId must not be in sourceIds');
     }
 
     const results = await Promise.allSettled(

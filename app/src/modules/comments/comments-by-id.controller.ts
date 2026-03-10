@@ -15,8 +15,8 @@ export class CommentsByIdController {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Patch(':commentId')
-  @ApiOperation({ summary: 'Редактирование комментария' })
-  @ApiResponse({ status: 200, description: 'Обновлённый комментарий' })
+  @ApiOperation({ summary: 'Edit comment' })
+  @ApiResponse({ status: 200, description: 'Updated comment' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async update(
     @CurrentCompany() companyId: string,
@@ -27,8 +27,8 @@ export class CommentsByIdController {
   }
 
   @Delete(':commentId')
-  @ApiOperation({ summary: 'Удаление комментария' })
-  @ApiResponse({ status: 200, description: 'Удалено' })
+  @ApiOperation({ summary: 'Delete comment' })
+  @ApiResponse({ status: 200, description: 'Deleted' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async delete(
     @CurrentCompany() companyId: string,

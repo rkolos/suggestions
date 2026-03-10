@@ -87,13 +87,13 @@ function formatApiBlock(request: unknown, response: unknown): string {
       ? safeJsonStringify(response)
       : String(response);
   return [
-    '### Запрос',
+    '### Request',
     '',
     '```json',
     requestPart,
     '```',
     '',
-    '### Ответ',
+    '### Response',
     '',
     '```json',
     responsePart,

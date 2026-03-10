@@ -69,7 +69,7 @@ describe('GlobalExceptionFilter', () => {
       expect.objectContaining({
         error: expect.objectContaining({
           code: 'DUPLICATE_ENTRY',
-          message: 'Запись с такими данными уже существует',
+          message: 'A record with such data already exists',
           path: '/test',
         }),
       }),
@@ -90,7 +90,7 @@ describe('GlobalExceptionFilter', () => {
       expect.objectContaining({
         error: expect.objectContaining({
           code: 'RECORD_NOT_FOUND',
-          message: 'Запись не найдена',
+          message: 'Record not found',
         }),
       }),
     );
@@ -108,7 +108,7 @@ describe('GlobalExceptionFilter', () => {
       expect.objectContaining({
         error: expect.objectContaining({
           code: 'INTERNAL_ERROR',
-          message: 'Внутренняя ошибка сервера',
+          message: 'Internal server error',
         }),
       }),
     );

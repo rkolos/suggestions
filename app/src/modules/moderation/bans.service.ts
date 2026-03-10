@@ -24,7 +24,7 @@ export class BansService {
       return true;
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
-        throw new ConflictException('Пользователь уже забанен');
+        throw new ConflictException('User is already banned');
       }
       throw e;
     }
@@ -82,7 +82,7 @@ export class BansService {
     if (banned) {
       throw new ForbiddenException({
         code: USER_BANNED_CODE,
-        message: 'Пользователь заблокирован',
+        message: 'User is blocked',
       });
     }
   }

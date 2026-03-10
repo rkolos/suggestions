@@ -7,10 +7,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Сервис доступен"
+            "description": "Service available"
           }
         },
-        "summary": "Проверка состояния сервиса",
+        "summary": "Health check",
         "tags": [
           "Health"
         ]
@@ -22,10 +22,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Контекст текущего запроса"
+            "description": "Current request context"
           }
         },
-        "summary": "Контекст: companyId, userId",
+        "summary": "Context: companyId, userId",
         "tags": [
           "Context"
         ]
@@ -37,10 +37,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Настройки"
+            "description": "Settings"
           }
         },
-        "summary": "Получение настроек (Categories, Notifications)",
+        "summary": "Get settings (Categories, Notifications)",
         "tags": [
           "Config"
         ]
@@ -60,10 +60,10 @@
         },
         "responses": {
           "200": {
-            "description": "Обновлённые настройки"
+            "description": "Updated settings"
           }
         },
-        "summary": "Обновление настроек",
+        "summary": "Update settings",
         "tags": [
           "Config"
         ]
@@ -75,10 +75,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Дефолтные настройки"
+            "description": "Default settings"
           }
         },
-        "summary": "Дефолтные шаблоны для Reset to Default",
+        "summary": "Default templates for Reset to Default",
         "tags": [
           "Config"
         ]
@@ -90,10 +90,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Шаблоны уведомлений"
+            "description": "Notification templates"
           }
         },
-        "summary": "Получение шаблонов уведомлений",
+        "summary": "Get notification templates",
         "tags": [
           "Notifications"
         ]
@@ -113,10 +113,10 @@
         },
         "responses": {
           "200": {
-            "description": "Обновлённые шаблоны"
+            "description": "Updated templates"
           }
         },
-        "summary": "Обновление шаблонов уведомлений",
+        "summary": "Update notification templates",
         "tags": [
           "Notifications"
         ]
@@ -128,10 +128,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Список предложений"
+            "description": "List of suggestions"
           }
         },
-        "summary": "Список предложений с фильтрами и пагинацией",
+        "summary": "List suggestions with filters and pagination",
         "tags": [
           "Suggestions"
         ]
@@ -151,13 +151,13 @@
         },
         "responses": {
           "201": {
-            "description": "Созданное предложение"
+            "description": "Created suggestion"
           },
           "400": {
             "description": "X-User-Id required"
           }
         },
-        "summary": "Создание предложения",
+        "summary": "Create suggestion",
         "tags": [
           "Suggestions"
         ]
@@ -169,10 +169,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Статистика по статусам"
+            "description": "Statistics by status"
           }
         },
-        "summary": "Счётчики по статусам",
+        "summary": "Counts by status",
         "tags": [
           "Suggestions"
         ]
@@ -193,13 +193,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Предложение"
+            "description": "Suggestion"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Детальная панель предложения",
+        "summary": "Suggestion detail panel",
         "tags": [
           "Suggestions"
         ]
@@ -228,13 +228,13 @@
         },
         "responses": {
           "200": {
-            "description": "Обновлённое предложение"
+            "description": "Updated suggestion"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Обновление предложения (статус, категория)",
+        "summary": "Update suggestion (status, category)",
         "tags": [
           "Suggestions"
         ]
@@ -253,13 +253,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Удалено"
+            "description": "Deleted"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Удаление предложения",
+        "summary": "Delete suggestion",
         "tags": [
           "Suggestions"
         ]
@@ -290,13 +290,13 @@
         },
         "responses": {
           "200": {
-            "description": "Обновлённое предложение"
+            "description": "Updated suggestion"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Изменение статуса предложения",
+        "summary": "Change suggestion status",
         "tags": [
           "Suggestions"
         ]
@@ -308,13 +308,13 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Результат слияния"
+            "description": "Merge result"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Слияние предложений (sourceId → targetId)",
+        "summary": "Merge suggestions (sourceId → targetId)",
         "tags": [
           "Suggestions"
         ]
@@ -345,13 +345,13 @@
         },
         "responses": {
           "200": {
-            "description": "Результат голосования"
+            "description": "Vote result"
           },
           "400": {
             "description": "X-User-Id required"
           }
         },
-        "summary": "Голосование upvote/downvote",
+        "summary": "Vote upvote/downvote",
         "tags": [
           "Suggestions"
         ]
@@ -372,13 +372,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Embed для Discord"
+            "description": "Embed for Discord"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Discord Preview: payload/embed для предпросмотра",
+        "summary": "Discord Preview: payload/embed for preview",
         "tags": [
           "Suggestions"
         ]
@@ -400,13 +400,13 @@
         },
         "responses": {
           "200": {
-            "description": "Успешно удалено"
+            "description": "Successfully deleted"
           },
           "207": {
-            "description": "Частичный успех (часть не удалена)"
+            "description": "Partial success (some not deleted)"
           }
         },
-        "summary": "Массовое удаление",
+        "summary": "Bulk delete",
         "tags": [
           "Bulk"
         ]
@@ -428,13 +428,13 @@
         },
         "responses": {
           "200": {
-            "description": "Успешно обновлено"
+            "description": "Successfully updated"
           },
           "207": {
-            "description": "Частичный успех"
+            "description": "Partial success"
           }
         },
-        "summary": "Массовое изменение статуса",
+        "summary": "Bulk status change",
         "tags": [
           "Bulk"
         ]
@@ -456,13 +456,13 @@
         },
         "responses": {
           "200": {
-            "description": "Успешно слито"
+            "description": "Successfully merged"
           },
           "207": {
-            "description": "Частичный успех"
+            "description": "Partial success"
           }
         },
-        "summary": "Массовое слияние",
+        "summary": "Bulk merge",
         "tags": [
           "Bulk"
         ]
@@ -483,10 +483,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Список комментариев"
+            "description": "List of comments"
           }
         },
-        "summary": "Team Chat — список комментариев",
+        "summary": "Team Chat — list comments",
         "tags": [
           "Comments"
         ]
@@ -515,13 +515,13 @@
         },
         "responses": {
           "201": {
-            "description": "Созданный комментарий"
+            "description": "Created comment"
           },
           "400": {
             "description": "X-User-Id required"
           }
         },
-        "summary": "Team Chat — отправка комментария",
+        "summary": "Team Chat — post comment",
         "tags": [
           "Comments"
         ]
@@ -552,13 +552,13 @@
         },
         "responses": {
           "200": {
-            "description": "Обновлённый комментарий"
+            "description": "Updated comment"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Редактирование комментария",
+        "summary": "Edit comment",
         "tags": [
           "Comments"
         ]
@@ -577,13 +577,13 @@
         ],
         "responses": {
           "200": {
-            "description": "Удалено"
+            "description": "Deleted"
           },
           "404": {
             "description": "Not found"
           }
         },
-        "summary": "Удаление комментария",
+        "summary": "Delete comment",
         "tags": [
           "Comments"
         ]
@@ -595,10 +595,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Список забаненных"
+            "description": "List of banned users"
           }
         },
-        "summary": "Список забаненных пользователей",
+        "summary": "List banned users",
         "tags": [
           "Bans"
         ]
@@ -618,10 +618,10 @@
         },
         "responses": {
           "200": {
-            "description": "Пользователь забанен"
+            "description": "User banned"
           }
         },
-        "summary": "Ban пользователя",
+        "summary": "Ban user",
         "tags": [
           "Bans"
         ]
@@ -633,10 +633,10 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Список забаненных"
+            "description": "List of banned users"
           }
         },
-        "summary": "Список забаненных пользователей",
+        "summary": "List banned users",
         "tags": [
           "Bans"
         ]
@@ -656,10 +656,10 @@
         },
         "responses": {
           "200": {
-            "description": "Пользователь забанен"
+            "description": "User banned"
           }
         },
-        "summary": "Ban пользователя",
+        "summary": "Ban user",
         "tags": [
           "Bans"
         ]
@@ -680,10 +680,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Пользователь разбанен"
+            "description": "User unbanned"
           }
         },
-        "summary": "Unban пользователя",
+        "summary": "Unban user",
         "tags": [
           "Bans"
         ]
@@ -704,10 +704,10 @@
         ],
         "responses": {
           "200": {
-            "description": "Пользователь разбанен"
+            "description": "User unbanned"
           }
         },
-        "summary": "Unban пользователя",
+        "summary": "Unban user",
         "tags": [
           "Bans"
         ]
@@ -719,13 +719,13 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": "Данные пользователя"
+            "description": "User data"
           },
           "400": {
             "description": "X-User-Id required"
           }
         },
-        "summary": "Текущий пользователь: id, username, avatarUrl, role, permissions",
+        "summary": "Current user: id, username, avatarUrl, role, permissions",
         "tags": [
           "Users"
         ]
@@ -734,7 +734,7 @@
   },
   "info": {
     "title": "Suggestions API",
-    "description": "API для управления предложениями (suggestions)",
+    "description": "API for managing suggestions",
     "version": "1.0",
     "contact": {}
   },

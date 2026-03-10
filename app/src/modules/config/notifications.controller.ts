@@ -12,21 +12,22 @@ export class NotificationsController {
   constructor(private readonly configService: CompanyConfigService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Получение шаблонов уведомлений' })
-  @ApiResponse({ status: 200, description: 'Шаблоны уведомлений' })
+  @ApiOperation({ summary: 'Get notification templates' })
+  @ApiResponse({ status: 200, description: 'Notification templates' })
   getNotifications(@CurrentCompany() companyId: string): Promise<Record<string, string>> {
     return this.configService.getNotifications(companyId);
   }
 
   @Put()
-  @ApiOperation({ summary: 'Обновление шаблонов уведомлений' })
-  @ApiResponse({ status: 200, description: 'Обновлённые шаблоны' })
+  @ApiOperation({ summary: 'Update notification templates' })
+  @ApiResponse({ status: 200, description: 'Updated templates' })
   updateNotifications(
     @CurrentCompany() companyId: string,
     @Body() body: NotificationTemplatesDto,
   ): Promise<Record<string, string>> {
     const notifications: Record<string, string> = {};
     if (body.ticket_created !== undefined) notifications.ticket_created = body.ticket_created;
+    if (body.ticket_published !== undefined) notifications.ticket_published = body.ticket_published;
     if (body.ticket_approved !== undefined) notifications.ticket_approved = body.ticket_approved;
     if (body.ticket_rejected !== undefined) notifications.ticket_rejected = body.ticket_rejected;
     if (body.ticket_merged !== undefined) notifications.ticket_merged = body.ticket_merged;
